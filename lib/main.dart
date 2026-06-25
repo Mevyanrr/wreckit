@@ -118,12 +118,17 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            ElevatedButton(onPressed: (){
+              UserService().deleteUserInfo("user 0");
+            }, child: const Icon(Icons.delete)
+            )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          UserService().createUser("jamal", "musiala", 32);
+          UserService().createUser("user $_counter", "jamal", "musiala", 32 + _counter);
+          _incrementCounter();
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
