@@ -41,3 +41,45 @@ class RedirectHop {
     required this.statusCode,
   });
 }
+
+class QrReportModel {
+  final int reportsCount;
+  final int protectedCount;
+  final int ageInDays;
+  final String forwardedToLabel;
+  final String forwardedToSubtitle;
+
+  const QrReportModel({
+    required this.reportsCount,
+    required this.protectedCount,
+    required this.ageInDays,
+    this.forwardedToLabel = 'Forwarded to BSSN',
+    this.forwardedToSubtitle = 'Threat team notified',
+  });
+
+  factory QrReportModel.fromJson(Map<String, dynamic> json) {
+    return QrReportModel(
+      reportsCount: json['reports_count'] as int? ?? 0,
+      protectedCount: json['protected_count'] as int? ?? 0,
+      ageInDays: json['age_in_days'] as int? ?? 0,
+      forwardedToLabel:
+          json['forwarded_to_label'] as String? ?? 'Forwarded to BSSN',
+      forwardedToSubtitle:
+          json['forwarded_to_subtitle'] as String? ?? 'Threat team notified',
+    );
+  }
+
+
+  String get protectedDisplay {
+    if (protectedCount >= 1000) {
+      final value = protectedCount / 1000;
+      final isWhole = value == value.roundToDouble();
+      return isWhole
+          ? '${value.toStringAsFixed(0)}K'
+          : '${value.toStringAsFixed(1)}K';
+    }
+    return protectedCount.toString();
+  }
+
+  String get ageDisplay => ageInDays == 1 ? '1 day' : '$ageInDays days';
+}
