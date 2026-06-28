@@ -9,7 +9,7 @@ import 'package:wreckit/scan_result/widgets/dangerous_card.dart';
 import 'package:wreckit/scan_result/widgets/pishing_detected_card.dart'; 
 import 'package:wreckit/scan_result/widgets/redirect_chain.dart';
 import 'package:wreckit/scan_result/widgets/risk_score_card.dart';
-import 'package:wreckit/scan_result/views/block_reported.dart ';
+import 'package:wreckit/scan_result/views/block_reported.dart';
 
 class ScanResultPage extends StatefulWidget {
   const ScanResultPage({super.key});
