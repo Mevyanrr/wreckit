@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'services/api_service.dart';
-=======
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:wreckit/main_feature/viewmodels/history_vm.dart';
@@ -12,7 +10,6 @@ import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
 import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
 import 'package:wreckit/scan_result/views/block_reported.dart'; 
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
->>>>>>> frontend
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
