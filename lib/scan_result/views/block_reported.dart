@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:wreckit/core/AppColors.dart';
-import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
 
 class BlockReportedPage extends StatelessWidget {
   const BlockReportedPage({super.key});
@@ -67,7 +67,7 @@ class BlockReportedPage extends StatelessWidget {
                   Row(
                             key: const ValueKey('stats'),
                             children: [
-                              // Container 1: REPORTS
+                              //reports
                               Expanded(
                                 child: Container(
                                   margin: EdgeInsets.symmetric(
@@ -114,7 +114,7 @@ class BlockReportedPage extends StatelessWidget {
                                 ),
                               ),
                         
-                              // Container 2: PROTECTED
+                              //protected
                               Expanded(
                                 child: Container(
                                   margin: EdgeInsets.symmetric(
@@ -161,7 +161,7 @@ class BlockReportedPage extends StatelessWidget {
                                 ),
                               ),
                         
-                              // Container 3: OLD
+                              //old
                               Expanded(
                                 child: Container(
                                   margin: EdgeInsets.symmetric(
@@ -213,7 +213,6 @@ class BlockReportedPage extends StatelessWidget {
 
                   SizedBox(height: 42.sp),
 
-                  // ----- Forwarded-to card -----
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(16.sp),
@@ -278,7 +277,6 @@ class BlockReportedPage extends StatelessWidget {
 
                   const Spacer(),
 
-                  // ----- Buttons -----
                   SizedBox(
                     width: double.infinity,
                     height: 52.sp,
@@ -291,9 +289,7 @@ class BlockReportedPage extends StatelessWidget {
                         foregroundColor: Appcolors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.sp),
-                          side: BorderSide(
-                            color: Appcolors.controlBtnBorder,
-                          ),
+                          
                         ),
                         elevation: 0,
                       ),
@@ -418,7 +414,7 @@ class _ShakeAnimationState extends State<_ShakeAnimation>
   late final Animation<double> _rotation;
    Timer? _repeatTimer;
  
-  // ~30 degrees in radians
+  //degree
   static const double _maxAngle = 0.32;
  
   @override
@@ -429,7 +425,7 @@ class _ShakeAnimationState extends State<_ShakeAnimation>
       duration: const Duration(milliseconds: 1000),
     );
  
-    // Sequence: 0 -> -30° -> +30° -> -15° -> 0°, settling back to center.
+    //shake effect
     _rotation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(begin: 0.0, end: -_maxAngle)

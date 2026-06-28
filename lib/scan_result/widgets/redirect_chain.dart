@@ -46,10 +46,10 @@ class RedirectChainCard extends StatelessWidget {
           itemBuilder: (context, index) {
             final hop = redirectChain[index];
             final isLast = index == redirectChain.length - 1;
-            
+
             final Color stepColor = isLast
-                ? const Color(0xFFEF4444) 
-                : (index == 0 ? Appcolors.accentTeal : const Color(0xFFF59E0B)); 
+                ? const Color(0xFFEF4444)
+                : (index == 0 ? Appcolors.accentTeal : const Color(0xFFF59E0B));
 
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +68,7 @@ class RedirectChainCard extends StatelessWidget {
                       Container(
                         width: 2.w,
                         height: 75.h,
-                        color: const Color(0xFF1E293B), 
+                        color: const Color(0xFF1E293B),
                       ),
                   ],
                 ),
@@ -91,7 +91,10 @@ class RedirectChainCard extends StatelessWidget {
                               Row(
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 5.w,
+                                      vertical: 2.h,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: stepColor,
                                       borderRadius: BorderRadius.circular(4.r),
@@ -107,7 +110,10 @@ class RedirectChainCard extends StatelessWidget {
                                   ),
                                   SizedBox(width: 6.w),
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 6.w,
+                                      vertical: 2.h,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: stepColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(4.r),
@@ -146,7 +152,7 @@ class RedirectChainCard extends StatelessWidget {
                         Text(
                           '${hop.statusCode}',
                           style: TextStyle(
-                            color: isLast ? const Color(0xFFEF4444) : Appcolors.textMuted,
+                            color: stepColor,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                           ),

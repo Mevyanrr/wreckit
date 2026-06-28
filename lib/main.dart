@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:wreckit/main_feature/viewmodels/main_vm.dart';
+import 'package:wreckit/main_feature/viewmodels/history_vm.dart';
+import 'package:wreckit/main_feature/viewmodels/scanner_vm.dart';
+import 'package:wreckit/main_feature/views/history_page.dart';
 import 'package:wreckit/main_feature/views/scanner_page.dart';
-import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
 import 'package:wreckit/scan_result/views/block_reported.dart'; 
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
 
@@ -30,6 +33,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<BlockReportedViewModel>(
           create: (_) => BlockReportedViewModel(),
         ),
+        ChangeNotifierProvider<ScanHistoryViewModel>(
+          create: (_) => ScanHistoryViewModel(),
+        ),
       ],
       child: ScreenUtilInit(
         designSize: const Size(360, 844),
@@ -44,9 +50,10 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               // scaffoldBackgroundColor: Appcolors.primaryColor,
             ),
-            initialRoute: '/block_reported', 
+            initialRoute: '/scanner', 
             routes: {
               '/scanner': (context) => const ScannerPage(),
+              '/history': (context) => const ScanHistoryPage(),
               '/scan_result': (context) => const ScanResultPage(),
               '/block_reported': (context) => const BlockReportedPage(),
             },

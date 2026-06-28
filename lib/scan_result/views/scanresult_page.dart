@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:wreckit/core/AppColors.dart';
-import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
 import 'package:wreckit/scan_result/widgets/core.dart';
 import 'package:wreckit/scan_result/widgets/dangerous_card.dart';
 import 'package:wreckit/scan_result/widgets/pishing_detected_card.dart'; 
 import 'package:wreckit/scan_result/widgets/redirect_chain.dart';
 import 'package:wreckit/scan_result/widgets/risk_score_card.dart';
+import 'package:wreckit/scan_result/views/block_reported.dart ';
 
 class ScanResultPage extends StatefulWidget {
   const ScanResultPage({super.key});
@@ -43,10 +45,17 @@ class _ScanResultPageState extends State<ScanResultPage> {
       appBar: AppBar(
         backgroundColor: Appcolors.primaryColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Appcolors.textPrimary, size: 24.sp),
-          onPressed: () => Navigator.pop(context),
+        leading: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Padding(
+          padding: EdgeInsets.only(left: 12.w),
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Appcolors.textPrimary,
+            size: 20.sp,
+          ),
         ),
+      ),
         title: Text(
           'QR Forensics',
           style: TextStyle(
@@ -84,7 +93,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
               ),
             ),
             SizedBox(height: 12.h),
-            DangerDetailsList(details: data.details),
+            DangerDetailsList(details: data.details, riskScore: data.riskScore),
             SizedBox(height: 0.025.sh),
           
             RedirectChainCard(redirectChain: data.redirectChain),
@@ -92,22 +101,38 @@ class _ScanResultPageState extends State<ScanResultPage> {
             
             //button dibawah page
             SizedBox(
-              width: double.infinity,
-              height: 0.06.sh,
-              child: ElevatedButton.icon(
-                onPressed: () => viewModel.blockAndReportSite(context),
-                icon: Icon(Icons.shield_outlined, color: Colors.white, size: 20.sp),
-                label: Text(
-                  'Block & Report Site',
-                  style: TextStyle(color: Colors.white, fontSize: 15.sp, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                  elevation: 0,
-                ),
-              ),
-            ),
+  width: double.infinity,
+  height: 0.06.sh,
+  child: ElevatedButton.icon(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => BlockReportedViewModel(),
+            child: const BlockReportedPage(),
+          ),
+        ),
+      );
+    },
+    icon: Icon(Icons.shield_outlined, color: Colors.white, size: 20.sp),
+    label: Text(
+      'Block & Report Site',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 15.sp,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFFEF4444),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      elevation: 0,
+    ),
+  ),
+),
             SizedBox(height: 12.h),
             
             SizedBox(

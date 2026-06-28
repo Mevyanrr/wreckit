@@ -1,3 +1,5 @@
+//SCANNER PAGE MODEL
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
 
 class ScannerModel {
   final bool isTorchOn;
@@ -27,16 +29,35 @@ class ScannerModel {
   }
 }
 
+//HISTORY PAGE MODEL
 class ScanHistoryItem {
   final String id;
   final String imagePath;
   final DateTime scannedAt;
-  final String? result;
-
+final ScanResultModel? scanResult;
+ 
   const ScanHistoryItem({
     required this.id,
     required this.imagePath,
     required this.scannedAt,
-    this.result,
+    this.scanResult,
   });
+
+
+String get displayLabel {
+    if (scanResult == null) return id;
+    final url = scanResult!.targetUrl
+        .replaceFirst(RegExp(r'https?://'), '')
+        .replaceFirst(RegExp(r'www\.'), '');
+    return url.length > 22 ? '${url.substring(0, 22)}…' : url;
+  }
+ 
+  int get riskScore => scanResult?.riskScore ?? 0;
+ 
+  String get riskStatus => scanResult?.riskStatus ?? 'safe';
+ 
+  RiskLevel get riskLevel => RiskLevelX.fromStatus(riskStatus);
+ 
+  /// Score dengan zero-padding dua digit, e.g. "02", "91"
+  String get formattedScore => riskScore.toString().padLeft(2, '0');
 }

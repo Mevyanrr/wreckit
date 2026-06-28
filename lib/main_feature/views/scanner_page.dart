@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:wreckit/core/AppColors.dart';
-import 'package:wreckit/main_feature/viewmodels/main_vm.dart';
+import 'package:wreckit/main_feature/viewmodels/scanner_vm.dart';
 import 'package:wreckit/main_feature/widgets/animation_scan.dart';
 import 'package:wreckit/main_feature/widgets/background.dart';
 import 'package:wreckit/main_feature/widgets/corner_scan.dart';
 import 'package:wreckit/main_feature/widgets/scannercontrol_button.dart';
+import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
+import 'package:wreckit/scan_result/views/scanresult_page.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({Key? key}) : super(key: key);
@@ -43,37 +45,104 @@ class _ScannerPageState extends State<ScannerPage>
     _fadeController.dispose();
     super.dispose();
   }
+  void _showLoadingDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => WillPopScope(
+        onWillPop: () async => false,
+        child: Dialog(
+          backgroundColor: const Color(0xFF1A2235),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 28.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 36.w,
+                  height: 36.w,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: Appcolors.accentTeal,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _navigateToScanResult(String imagePath) async {
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => ScanResultViewModel()..loadScanResult(),
+          child: const ScanResultPage(),
+        ),
+      ),
+    );
+  }
 
   Future<void> _onTapToScan() async {
     HapticFeedback.mediumImpact();
     final vm = context.read<ScannerViewModel>();
+
     final path = await vm.captureImage();
-    if (path != null && mounted) {
-     //BE SERVICE
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Image captured. Ready to upload.'),
-          backgroundColor: Appcolors.accentTealDim,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    if (path == null || !mounted) return;
+
+    _showLoadingDialog('Processing image...');
+    await Future.delayed(const Duration(seconds: 2));
+
+    //simulasi save ke data be
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop(); 
+
+    _showLoadingDialog('Saving scan data...');
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+
+    await _navigateToScanResult(path);
   }
 
   Future<void> _onUpload() async {
     HapticFeedback.lightImpact();
     final vm = context.read<ScannerViewModel>();
+
     final path = await vm.pickFileFromDevice();
-    if (path != null && mounted) {
-      //BE SERVICE
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('File selected: ${path.split('/').last}'),
-          backgroundColor: Appcolors.accentTealDim,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    if (path == null || !mounted) return;
+
+    _showLoadingDialog('Processing file...');
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+
+    _showLoadingDialog('Saving scan data...');
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+
+    await _navigateToScanResult(path);
   }
 
   void _onHistory() {
@@ -135,7 +204,6 @@ class _ScannerPageState extends State<ScannerPage>
                             onUpload: _onUpload,
                             onHistory: _onHistory,
                           ),
-
                         ],
                       );
                     },
@@ -149,7 +217,6 @@ class _ScannerPageState extends State<ScannerPage>
     );
   }
 }
-
 
 class _TopBar extends StatelessWidget {
   final VoidCallback onCancel;
@@ -215,18 +282,14 @@ class _Viewfinder extends StatelessWidget {
                 controller: cameraController,
                 isInitialized: isCameraInitialized,
               ),
-
               CustomPaint(painter: CircuitBackgroundPainter()),
-
               AnimatedScanLine(isActive: true),
-
               CustomPaint(
                 painter: ScannerCornerPainter(
                   cornerLength: 28,
                   strokeWidth: 2.5,
                 ),
               ),
-
               Center(
                 child: _TapToScanButton(
                   isScanning: isScanning,
@@ -252,7 +315,6 @@ class _CameraLayer extends StatelessWidget {
     if (isInitialized && controller != null) {
       return CameraPreview(controller!);
     }
-
     return Container(
       color: Appcolors.scannerBg,
       child: Center(
@@ -386,10 +448,7 @@ class _BottomControls extends StatelessWidget {
       decoration: BoxDecoration(
         color: Appcolors.secondaryColor,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: Appcolors.divider,
-          width: 1,
-        ),
+        border: Border.all(color: Appcolors.divider, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +464,6 @@ class _BottomControls extends StatelessWidget {
               ),
             ),
           ),
-
           Text(
             'SCANNER CONTROLS',
             style: TextStyle(
@@ -415,9 +473,7 @@ class _BottomControls extends StatelessWidget {
               letterSpacing: 1.8,
             ),
           ),
-
           SizedBox(height: 16.h),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

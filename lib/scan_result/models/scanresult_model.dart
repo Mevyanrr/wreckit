@@ -1,10 +1,49 @@
+import 'dart:ui';
+
+enum RiskLevel { safe, suspicious, critical }
+ 
+extension RiskLevelX on RiskLevel {
+  static RiskLevel fromStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'critical':
+        return RiskLevel.critical;
+      case 'suspicious':
+        return RiskLevel.suspicious;
+      default:
+        return RiskLevel.safe;
+    }
+  }
+ 
+  String get label {
+    switch (this) {
+      case RiskLevel.safe:
+        return 'SAFE';
+      case RiskLevel.suspicious:
+        return 'SUSPICIOUS';
+      case RiskLevel.critical:
+        return 'CRITICAL';
+    }
+  }
+ 
+  Color get color {
+    switch (this) {
+      case RiskLevel.safe:
+        return const Color(0xFF4CAF50);
+      case RiskLevel.suspicious:
+        return const Color(0xFFFFC107);
+      case RiskLevel.critical:
+        return const Color(0xFFFF5252);
+    }
+  }
+}
+ 
 class ScanResultModel {
   final String targetUrl;
   final int riskScore;
   final String riskStatus;
   final List<WhyDangerousItem> details;
   final List<RedirectHop> redirectChain;
-
+ 
   ScanResultModel({
     required this.targetUrl,
     required this.riskScore,
@@ -12,6 +51,8 @@ class ScanResultModel {
     required this.details,
     required this.redirectChain,
   });
+ 
+  RiskLevel get riskLevel => RiskLevelX.fromStatus(riskStatus);
 }
 
 class WhyDangerousItem {

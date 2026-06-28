@@ -2,7 +2,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
-import 'package:wreckit/main_feature/models/main_model.dart';
+import 'package:wreckit/main_feature/models/scanner_model.dart';
 
 class ScannerViewModel extends ChangeNotifier {
   ScannerModel _state = const ScannerModel();
@@ -112,3 +112,4 @@ class ScannerViewModel extends ChangeNotifier {
     super.dispose();
   }
 }
+
