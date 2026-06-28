@@ -10,6 +10,8 @@ import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
 import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
 import 'package:wreckit/scan_result/views/block_reported.dart'; 
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
+import 'package:wreckit/splash_onboarding/view/onboarding1.dart';
+import 'package:wreckit/splash_onboarding/view/onboarding2.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -51,8 +53,10 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               // scaffoldBackgroundColor: Appcolors.primaryColor,
             ),
-            initialRoute: '/scanner', 
+            initialRoute: '/onboarding1', 
             routes: {
+              '/onboarding1': (context) => const Onboarding1(),
+              '/onboarding2': (context) => const Onboarding2(),
               '/scanner': (context) => const ScannerPage(),
               '/history': (context) => const ScanHistoryPage(),
               '/scan_result': (context) => const ScanResultPage(),

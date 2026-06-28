@@ -19,4 +19,5 @@ class Appcolors {
   static const Color scanLineOpaque = Color(0xFF2DD4BF);
   static const Color cancelBtnBg = Color(0x330D1E35);
   static const Color circuitDot = Color(0xFF1B3A52);
+  static const Color onboard= Color(0xFF8AEBFF);
 }
