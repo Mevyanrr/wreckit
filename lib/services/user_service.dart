@@ -42,4 +42,21 @@ class UserService{
       print("document $username unable to deleted");
     }
   }
+
+  Future<void> addHistory(String macAddress, Timestamp date, String link, int score, int historynum) async{
+    try {
+      final history = <String, Object>{
+        "date" : date,
+        "link" : link,
+        "score" : score,
+      };
+
+      DocumentReference hist = FirebaseService.firestore.collection(macAddress).doc("history + $historynum");
+      await hist.set(history);
+      print("Document added with id ${hist.id}");
+    }
+    catch(e){
+      print("unable to add document $macAddress");
+    }
+  }
 }
