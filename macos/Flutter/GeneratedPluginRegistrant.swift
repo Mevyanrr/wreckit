@@ -8,7 +8,7 @@ import Foundation
 import cloud_firestore
 import file_picker
 import firebase_core
-import isar_flutter_libs
+import isar_community_flutter_libs
 import share_plus
 import url_launcher_macos
 

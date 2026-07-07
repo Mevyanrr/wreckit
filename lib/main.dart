@@ -15,11 +15,14 @@ import 'package:wreckit/scan_result/views/block_reported.dart';
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
 import 'package:wreckit/splash_onboarding/view/onboarding1.dart';
 import 'package:wreckit/splash_onboarding/view/onboarding2.dart';
+import 'package:isar_community/isar.dart';
+import 'services/local_db_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DbService.init();
   runApp(const MyApp());
 }
 
