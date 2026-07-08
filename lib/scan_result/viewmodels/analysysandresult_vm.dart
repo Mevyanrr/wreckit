@@ -14,7 +14,7 @@ class ScanResultViewModel extends ChangeNotifier {
 
     _scanResult = ScanResultModel(
       targetUrl: 'phishing-site.info/login/verify',
-      riskScore: 62,
+      riskScore: 92,
       riskStatus: 'Phishing Detected',
       details: [
         WhyDangerousItem(title: 'GENERATOR TOOL', value: 'QR Tiger Pro'),

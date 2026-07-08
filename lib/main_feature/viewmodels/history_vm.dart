@@ -196,9 +196,9 @@ class ScanHistoryViewModel extends ChangeNotifier {
       );
       String label;
       if (d == today) {
-        label = 'TODAY';
+        label = 'HARI INI';
       } else if (d == yesterday) {
-        label = 'YESTERDAY';
+        label = 'KEMARIN';
       } else {
         label = _formatDate(d);
       }

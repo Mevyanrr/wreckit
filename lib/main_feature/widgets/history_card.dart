@@ -149,7 +149,7 @@ class _ScoreWidget extends StatelessWidget {
         ),
         const SizedBox(height: 3),
         const Text(
-          'SCORE',
+          'NILAI',
           style: TextStyle(
             color: Color(0xFF6B7A99),
             fontSize: 9,

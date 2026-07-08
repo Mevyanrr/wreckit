@@ -176,7 +176,7 @@ class _ScannerPageState extends State<ScannerPage>
                           SizedBox(height: 20.h),
 
                           Text(
-                            'Point camera at a QR code',
+                            'Arahkan kamera ke kode QR',
                             style: TextStyle(
                               color: Appcolors.textMuted,
                               fontSize: 14.sp,
@@ -366,7 +366,7 @@ class _TapToScanButton extends StatelessWidget {
                 ),
               )
             : Text(
-                'Tap to Scan',
+                'Klik untuk memindai',
                 style: TextStyle(
                   color: Appcolors.accentTeal,
                   fontSize: 15.sp,
@@ -465,7 +465,7 @@ class _BottomControls extends StatelessWidget {
             ),
           ),
           Text(
-            'SCANNER CONTROLS',
+            'KONTROL PEMINDAI',
             style: TextStyle(
               color: Appcolors.textMuted,
               fontSize: 10.sp,
@@ -479,18 +479,18 @@ class _BottomControls extends StatelessWidget {
             children: [
               ScannerControlButton(
                 icon: Icons.flashlight_on_rounded,
-                label: 'Torch',
+                label: 'Flash',
                 isActive: isTorchOn,
                 onTap: onTorch,
               ),
               ScannerControlButton(
                 icon: Icons.upload_file_rounded,
-                label: 'Upload',
+                label: 'Unggah',
                 onTap: onUpload,
               ),
               ScannerControlButton(
                 icon: Icons.history_rounded,
-                label: 'History',
+                label: 'Riwayat',
                 onTap: onHistory,
               ),
             ],
