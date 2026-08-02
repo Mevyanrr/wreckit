@@ -2,189 +2,156 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:wreckit/core/AppColors.dart';
-import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
-import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
-import 'package:wreckit/scan_result/widgets/core.dart';
-import 'package:wreckit/scan_result/widgets/dangerous_card.dart';
-import 'package:wreckit/scan_result/widgets/pishing_detected_card.dart'; 
-import 'package:wreckit/scan_result/widgets/redirect_chain.dart';
-import 'package:wreckit/scan_result/widgets/risk_score_card.dart';
-import 'package:wreckit/scan_result/views/block_reported.dart ';
-
-class ScanResultPage extends StatefulWidget {
-  const ScanResultPage({super.key});
-
-  @override
-  State<ScanResultPage> createState() => _ScanResultPageState();
-}
-class _ScanResultPageState extends State<ScanResultPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ScanResultViewModel>().loadScanResult();
-    });
-  }
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
+import 'package:wreckit/scan_result/viewmodels/detailanalisis_vm.dart';
+import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
+import 'package:wreckit/scan_result/views/detail_analisis.dart';
+import 'package:wreckit/scan_result/widgets/action_button.dart';
+import 'package:wreckit/scan_result/widgets/status_visual.dart';
+import 'package:wreckit/scan_result/widgets/url_analyzed.dart';
+class ScanResultPage extends StatelessWidget {
+  final ScanResultModel result;
+  const ScanResultPage({super.key, required this.result});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ScanResultViewModel>();
-    final data = viewModel.scanResult;
+    return ChangeNotifierProvider(
+      create: (_) => ScanResultViewModel(result),
+      child: const _ScanResultView(),
+    );
+  }
+}
 
-    if (viewModel.isLoading || data == null) {
-      return const Scaffold(
-        backgroundColor: Appcolors.primaryColor,
-        body: Center(child: CircularProgressIndicator(color: Appcolors.accentTeal)),
-      );
-    }
-    final Color dynamicColor = getRiskColor(data.riskScore);
-    final String dynamicLabel = getRiskPhishingLabel(data.riskScore);
+class _ScanResultView extends StatelessWidget {
+  const _ScanResultView();
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<ScanResultViewModel>();
+    final result = vm.result;
+    final color = Appcolors.primary(result.status);
 
     return Scaffold(
-      backgroundColor: Appcolors.primaryColor,
+      backgroundColor: Appcolors.background,
       appBar: AppBar(
-        backgroundColor: Appcolors.primaryColor,
+        backgroundColor: Appcolors.background,
         elevation: 0,
-        leading: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
-        child: Padding(
-          padding: EdgeInsets.only(left: 12.w),
-          child: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Appcolors.textPrimary,
-            size: 20.sp,
-          ),
-        ),
-      ),
-        title: Text(
-          'QR Forensics',
-          style: TextStyle(
-            color: Appcolors.textPrimary,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white, size: 20.sp),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Text(
+          'QRisk Forensic',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 0.02.sh),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PhishingInfoCard(
-              targetUrl: data.targetUrl,       
-              riskStatus: dynamicLabel,        
-              statusColor: dynamicColor,       
-              detectionText: data.riskStatus,  
-            ),
-            SizedBox(height: 0.02.sh),
-            
-            RiskScoreCard(riskScore: data.riskScore),
-            SizedBox(height: 0.025.sh),
-            
-            Text(
-              'WHY IT\'S DANGEROUS',
-              style: TextStyle(
-                color: Appcolors.textMuted,
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
+      body: Column(
+        children: [
+          // konten bisa scroll
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Column(
+                children: [
+                  SizedBox(height: 24.h),
+                  StatusVisual(status: result.status),
+                  SizedBox(height: 24.h),
+                  Text(
+                    result.title,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: result.status == ScanStatus.bahaya
+                          ? 30.sp
+                          : 32.sp,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (result.subtitle != null) ...[
+                    SizedBox(height: 8.h),
+                    Text(
+                      result.subtitle!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 10.h),
+                  Text(
+                    result.description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Appcolors.textGrey,
+                      fontSize: 13.5.sp,
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                  UrlAnalyzedCard(result: result, viewModel: vm),
+                  if (result.status != ScanStatus.aman) ...[
+                    SizedBox(height: 14.h),
+                    _DetailAnalysisButton(),
+                  ],
+                  SizedBox(height: 24.h),
+                ],
               ),
             ),
-            SizedBox(height: 12.h),
-            DangerDetailsList(details: data.details, riskScore: data.riskScore),
-            SizedBox(height: 0.025.sh),
-          
-            RedirectChainCard(redirectChain: data.redirectChain),
-            SizedBox(height: 0.025.sh),
-            
-            //button dibawah page
-            SizedBox(
-  width: double.infinity,
-  height: 0.06.sh,
-  child: ElevatedButton.icon(
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider(
-            create: (_) => BlockReportedViewModel(),
-            child: const BlockReportedPage(),
           ),
-        ),
-      );
-    },
-    icon: Icon(Icons.shield_outlined, color: Colors.white, size: 20.sp),
-    label: Text(
-      'Block & Report Site',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 15.sp,
-        fontWeight: FontWeight.w600,
+          // area tombol tetap menempel di bawah
+          Padding(
+            padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+            child: ActionButtons(viewModel: vm),
+          ),
+        ],
       ),
-    ),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFFEF4444),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      elevation: 0,
+    );
+  }
+}
+
+class _DetailAnalysisButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14.r),
+      onTap: () {
+        Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => ChangeNotifierProvider(
+      create: (_) => AnalysisDetailViewModel(),
+      child: const DetailAnalisisScreen(),
     ),
   ),
-),
-            SizedBox(height: 12.h),
-            
-            SizedBox(
-              width: double.infinity,
-              height: 0.06.sh,
-              child: OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: const Color(0xFF070F1B),
-                  side: const BorderSide(color: Color(0xFF1E293B)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                ),
-                child: Text(
-                  'Scan Another Code',
-                  style: TextStyle(color: Appcolors.textPrimary, fontSize: 15.sp, fontWeight: FontWeight.w600),
-                ),
-              ),
+);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: Appcolors.card,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: Appcolors.cardBorder),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Lihat Detail Analisis',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 0.02.sh),
-            
-            Center(
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Proceed to link/site (on your risk)',
-                  style: TextStyle(
-                    color: Appcolors.textMuted,
-                    fontSize: 13.sp,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 0.015.sh),
-            
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.lock_outline, size: 14.sp, color: Appcolors.accentTeal),
-                SizedBox(width: 6.w),
-                Text(
-                  'SECURED BY QRISK',
-                  style: TextStyle(
-                    color: Appcolors.textMuted,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 0.025.sh),
+            SizedBox(width: 6.w),
+            Icon(Icons.chevron_right_rounded,
+                color: Colors.white, size: 18.sp),
           ],
         ),
       ),

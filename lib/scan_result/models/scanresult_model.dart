@@ -1,126 +1,157 @@
-import 'dart:ui';
+import 'package:flutter/material.dart'; 
+
+enum ScanStatus { bahaya, aman, waspada }
 
 enum RiskLevel { safe, suspicious, critical }
- 
-extension RiskLevelX on RiskLevel {
-  static RiskLevel fromStatus(String status) {
-    switch (status.toLowerCase()) {
-      case 'critical':
-        return RiskLevel.critical;
-      case 'suspicious':
-        return RiskLevel.suspicious;
-      default:
-        return RiskLevel.safe;
+
+class ScanResultModel {
+  final ScanStatus status;
+  final String title;
+  final String? subtitle;
+  final String description;
+  final String url;
+  final String urlLabel;
+  final List<String>? badges;
+
+  const ScanResultModel({
+    required this.status,
+    required this.title,
+    this.subtitle,
+    required this.description,
+    required this.url,
+    required this.urlLabel,
+    this.badges,
+  });
+
+  String get targetUrl => url;
+
+  int get riskScore {
+    switch (status) {
+      case ScanStatus.bahaya:
+        return 90;
+      case ScanStatus.waspada:
+        return 50;
+      case ScanStatus.aman:
+        return 5;
     }
   }
- 
-  String get label {
-    switch (this) {
-      case RiskLevel.safe:
-        return 'SAFE';
-      case RiskLevel.suspicious:
-        return 'SUSPICIOUS';
-      case RiskLevel.critical:
-        return 'CRITICAL';
+
+  String get riskStatus {
+    switch (status) {
+      case ScanStatus.bahaya:
+        return 'critical';
+      case ScanStatus.waspada:
+        return 'suspicious';
+      case ScanStatus.aman:
+        return 'safe';
     }
   }
- 
+
+  factory ScanResultModel.bahaya({required String url}) => ScanResultModel(
+        status: ScanStatus.bahaya,
+        title: 'BAHAYA',
+        subtitle: 'Situs Penipuan Ditemukan',
+        description:
+            'Tautan ini terbukti sebagai situs penipuan (phishing). Akses diblokir untuk melindungi data dan uang Anda.',
+        url: url,
+        urlLabel: 'MALICIOUS URL DETECTED',
+      );
+
+  factory ScanResultModel.aman({required String url}) => ScanResultModel(
+        status: ScanStatus.aman,
+        title: 'Aman',
+        description:
+            'Tidak ada tanda-tanda penipuan. Tautan ini aman untuk dikunjungi.',
+        url: url,
+        urlLabel: 'URL TERANALISIS',
+        badges: const ['SSL VERIFIED', 'NO PHISHING FOUND'],
+      );
+
+  factory ScanResultModel.waspada({required String url}) => ScanResultModel(
+        status: ScanStatus.waspada,
+        title: 'Waspada',
+        description:
+            'Tautan ini menggunakan alamat yang tidak biasa. Berhati-hatilah sebelum memasukkan data pribadi atau melakukan pembayaran.',
+        url: url,
+        urlLabel: 'URL TERANALISIS',
+      );
+}
+extension RiskLevelExtension on RiskLevel {
   Color get color {
     switch (this) {
-      case RiskLevel.safe:
-        return const Color(0xFF4CAF50);
-      case RiskLevel.suspicious:
-        return const Color(0xFFFFC107);
       case RiskLevel.critical:
-        return const Color(0xFFFF5252);
+        return const Color(0xFFFF4C4C); 
+      case RiskLevel.suspicious:
+        return const Color(0xFFFFB020); 
+      case RiskLevel.safe:
+      default:
+        return const Color(0xFF00E676); 
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case RiskLevel.critical:
+        return 'BAHAYA';
+      case RiskLevel.suspicious:
+        return 'WASPADA';
+      case RiskLevel.safe:
+      default:
+        return 'AMAN';
     }
   }
 }
- 
-class ScanResultModel {
-  final String targetUrl;
-  final int riskScore;
-  final String riskStatus;
-  final List<WhyDangerousItem> details;
-  final List<RedirectHop> redirectChain;
- 
-  ScanResultModel({
-    required this.targetUrl,
-    required this.riskScore,
-    required this.riskStatus,
-    required this.details,
-    required this.redirectChain,
-  });
- 
-  RiskLevel get riskLevel => RiskLevelX.fromStatus(riskStatus);
-}
 
-class WhyDangerousItem {
-  final String title;
-  final String value;
-  final bool isWarning;
+class EngineCheckItem {
+  final String name;
+  final int weightPercentage;
+  final String description;
+  final double progress; 
+  final IconData icon;
 
-  WhyDangerousItem({
-    required this.title,
-    required this.value,
-    this.isWarning = false,
-  });
-}
-
-class RedirectHop {
-  final int step;
-  final String type;
-  final String title;
-  final String subtitle;
-  final int statusCode;
-
-  RedirectHop({
-    required this.step,
-    required this.type,
-    required this.title,
-    required this.subtitle,
-    required this.statusCode,
-  });
-}
-
-class QrReportModel {
-  final int reportsCount;
-  final int protectedCount;
-  final int ageInDays;
-  final String forwardedToLabel;
-  final String forwardedToSubtitle;
-
-  const QrReportModel({
-    required this.reportsCount,
-    required this.protectedCount,
-    required this.ageInDays,
-    this.forwardedToLabel = 'Forwarded to BSSN',
-    this.forwardedToSubtitle = 'Threat team notified',
+  EngineCheckItem({
+    required this.name,
+    required this.weightPercentage,
+    required this.description,
+    required this.progress,
+    required this.icon,
   });
 
-  factory QrReportModel.fromJson(Map<String, dynamic> json) {
-    return QrReportModel(
-      reportsCount: json['reports_count'] as int? ?? 0,
-      protectedCount: json['protected_count'] as int? ?? 0,
-      ageInDays: json['age_in_days'] as int? ?? 0,
-      forwardedToLabel:
-          json['forwarded_to_label'] as String? ?? 'Forwarded to BSSN',
-      forwardedToSubtitle:
-          json['forwarded_to_subtitle'] as String? ?? 'Threat team notified',
+  factory EngineCheckItem.fromJson(Map<String, dynamic> json) {
+    return EngineCheckItem(
+      name: json['name'] ?? '',
+      weightPercentage: json['weight_percentage'] ?? 0,
+      description: json['description'] ?? '',
+      progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+      icon: json['icon'] ?? Icons.security,
     );
   }
+}
 
+class AnalysisDetailModel {
+  final String status;
+  final int riskScore;
+  final String scannedUrl;
+  final List<String> systemSummaries;
+  final List<EngineCheckItem> engineChecks;
 
-  String get protectedDisplay {
-    if (protectedCount >= 1000) {
-      final value = protectedCount / 1000;
-      final isWhole = value == value.roundToDouble();
-      return isWhole
-          ? '${value.toStringAsFixed(0)}K'
-          : '${value.toStringAsFixed(1)}K';
-    }
-    return protectedCount.toString();
+  AnalysisDetailModel({
+    required this.status,
+    required this.riskScore,
+    required this.scannedUrl,
+    required this.systemSummaries,
+    required this.engineChecks,
+  });
+
+  factory AnalysisDetailModel.fromJson(Map<String, dynamic> json) {
+    return AnalysisDetailModel(
+      status: json['status'] ?? 'AMAN',
+      riskScore: json['risk_score'] ?? 0,
+      scannedUrl: json['scanned_url'] ?? '',
+      systemSummaries: List<String>.from(json['system_summaries'] ?? []),
+      engineChecks: (json['engine_checks'] as List? ?? [])
+          .map((item) => EngineCheckItem.fromJson(item))
+          .toList(),
+    );
   }
-
-  String get ageDisplay => ageInDays == 1 ? '1 day' : '$ageInDays days';
 }

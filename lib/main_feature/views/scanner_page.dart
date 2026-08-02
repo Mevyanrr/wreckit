@@ -9,7 +9,8 @@ import 'package:wreckit/main_feature/widgets/animation_scan.dart';
 import 'package:wreckit/main_feature/widgets/background.dart';
 import 'package:wreckit/main_feature/widgets/corner_scan.dart';
 import 'package:wreckit/main_feature/widgets/scannercontrol_button.dart';
-import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
+import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
 
 class ScannerPage extends StatefulWidget {
@@ -45,6 +46,7 @@ class _ScannerPageState extends State<ScannerPage>
     _fadeController.dispose();
     super.dispose();
   }
+
   void _showLoadingDialog(String message) {
     showDialog(
       context: context,
@@ -89,15 +91,32 @@ class _ScannerPageState extends State<ScannerPage>
 
   Future<void> _navigateToScanResult(String imagePath) async {
     if (!mounted) return;
+
+    // 1. Dapatkan ScanResultModel dari hasil scan
+    final ScanResultModel result = _processScan(imagePath);
+
+    // 2. Navigasi sambil oper parameter 'result'
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider(
-          create: (_) => ScanResultViewModel()..loadScanResult(),
-          child: const ScanResultPage(),
+          // Positional Parameter (Tanpa "result:")
+          create: (_) => ScanResultViewModel(result), 
+          // Named Parameter (Memakai "result: result")
+          child: ScanResultPage(result: result), 
         ),
       ),
     );
+  }
+
+  // Method pemroses scan (Cukup ditulis 1x saja)
+  ScanResultModel _processScan(String path) {
+    if (path.contains('phishing') || path.contains('bit.ly')) {
+      return ScanResultModel.bahaya(url: path);
+    } else if (path.contains('suspicious') || path.contains('tinyurl')) {
+      return ScanResultModel.waspada(url: path);
+    }
+    return ScanResultModel.aman(url: path);
   }
 
   Future<void> _onTapToScan() async {
@@ -110,7 +129,6 @@ class _ScannerPageState extends State<ScannerPage>
     _showLoadingDialog('Processing image...');
     await Future.delayed(const Duration(seconds: 2));
 
-    //simulasi save ke data be
     if (!mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); 
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wreckit/core/AppColors.dart';
 
-//animation horizontal line
 class ScanLine extends StatefulWidget {
   final bool isActive;
   const ScanLine({Key? key, this.isActive = true}) : super(key: key);
@@ -132,7 +131,6 @@ class _ScanLineBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Glow trail above
         Container(
           height: 24,
           decoration: const BoxDecoration(
