@@ -97,7 +97,7 @@ class _StatusVisualState extends State<StatusVisual>
       );
 }
 
-// Segitiga warning custom (dipakai untuk Bahaya & Waspada)
+//bahaya sm waspada 
 class _TrianglePainter extends CustomPainter {
   final Color color;
   _TrianglePainter({required this.color});

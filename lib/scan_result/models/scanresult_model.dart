@@ -49,7 +49,7 @@ class ScanResultModel {
 
   factory ScanResultModel.bahaya({required String url}) => ScanResultModel(
         status: ScanStatus.bahaya,
-        title: 'BAHAYA',
+        title: 'Bahaya',
         subtitle: 'Situs Penipuan Ditemukan',
         description:
             'Tautan ini terbukti sebagai situs penipuan (phishing). Akses diblokir untuk melindungi data dan uang Anda.',
@@ -153,5 +153,25 @@ class AnalysisDetailModel {
           .map((item) => EngineCheckItem.fromJson(item))
           .toList(),
     );
+  }
+}
+
+class ReportModel {
+  final String url;
+  final String? location;
+  final String? notes;
+
+  ReportModel({
+    required this.url,
+    this.location,
+    this.notes,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'location': location ?? '',
+      'notes': notes ?? '',
+    };
   }
 }

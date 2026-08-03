@@ -21,7 +21,6 @@ class ScanResultViewModel extends ChangeNotifier {
       if (secondsLeft <= 1) {
         timer.cancel();
         isAutoOpening = false;
-        // TODO: panggil url_launcher untuk buka browser sesungguhnya
       } else {
         secondsLeft--;
       }
@@ -29,7 +28,6 @@ class ScanResultViewModel extends ChangeNotifier {
     });
   }
 
-  // Dipanggil saat user tekan "Batalkan & Lihat Detail Analisis"
   void cancelAutoOpen() {
     _timer?.cancel();
     isAutoOpening = false;

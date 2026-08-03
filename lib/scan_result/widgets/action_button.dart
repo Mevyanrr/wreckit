@@ -6,6 +6,7 @@ import 'package:wreckit/scan_result/models/scanresult_model.dart';
 import 'package:wreckit/scan_result/viewmodels/detailanalisis_vm.dart';
 import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/scan_result/views/detail_analisis.dart';
+import 'package:wreckit/scan_result/views/lapor_page.dart';
 
 
 class ActionButtons extends StatelessWidget {
@@ -21,7 +22,14 @@ class ActionButtons extends StatelessWidget {
           icon: Icons.shield_rounded,
           color: Appcolors.red,
           textColor: Colors.white,
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ReportScreen(),
+                ),
+              );
+          },
         );
 
       case ScanStatus.aman:

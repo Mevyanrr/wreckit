@@ -91,32 +91,26 @@ class _ScannerPageState extends State<ScannerPage>
 
   Future<void> _navigateToScanResult(String imagePath) async {
     if (!mounted) return;
-
-    // 1. Dapatkan ScanResultModel dari hasil scan
     final ScanResultModel result = _processScan(imagePath);
 
-    // 2. Navigasi sambil oper parameter 'result'
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider(
-          // Positional Parameter (Tanpa "result:")
           create: (_) => ScanResultViewModel(result), 
-          // Named Parameter (Memakai "result: result")
           child: ScanResultPage(result: result), 
         ),
       ),
     );
   }
 
-  // Method pemroses scan (Cukup ditulis 1x saja)
   ScanResultModel _processScan(String path) {
     if (path.contains('phishing') || path.contains('bit.ly')) {
       return ScanResultModel.bahaya(url: path);
     } else if (path.contains('suspicious') || path.contains('tinyurl')) {
       return ScanResultModel.waspada(url: path);
     }
-    return ScanResultModel.aman(url: path);
+    return ScanResultModel.waspada(url: path);
   }
 
   Future<void> _onTapToScan() async {
