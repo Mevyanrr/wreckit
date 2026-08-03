@@ -30,7 +30,7 @@ class Onboarding1 extends StatelessWidget {
               SizedBox(height: 44.h),
 
               Text(
-                'Scan. Analyze.\nStay Safe.',
+                'Pindai. Analisis.\nTetap Aman.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 28.sp,
@@ -44,7 +44,7 @@ class Onboarding1 extends StatelessWidget {
               SizedBox(height: 16.h),
 
               Text(
-                'QRisk inspects QR codes for hidden redirect\nchains, phishing URLs, and suspicious metadata\nbefore you ever click.',
+                'QRisk memeriksa kode QR secara real-time untuk\nmendeteksi pengalihan tersembunyi, URL phishing,\ndan metadata berbahaya sebelum Anda klik.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.sp,
@@ -61,9 +61,9 @@ class Onboarding1 extends StatelessWidget {
                 spacing: 8.w,
                 runSpacing: 8.h,
                 children: const [
-                  _FeatureChip(label: 'REDIRECT CHAIN ANALYSIS'),
-                  _FeatureChip(label: 'PHISHING DETECTION'),
-                  _FeatureChip(label: 'ORIGIN TRACKING'),
+                  _FeatureChip(label: 'ANALISIS RANTAI PENGALIHAN'),
+                  _FeatureChip(label: 'DETEKSI PHISHING'),
+                  _FeatureChip(label: 'PELACAKAN SUMBER'),
                 ],
               ),
 
@@ -88,7 +88,7 @@ class Onboarding1 extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Get Started',
+                        'Mulai Memindai',
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
@@ -105,7 +105,7 @@ class Onboarding1 extends StatelessWidget {
               SizedBox(height: 12.h),
 
               Text(
-                'No account required  •  Privacy-first analysis',
+                'Tanpa buat akun  •  Analisis berbasis privasi',
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: Appcolors.textMuted,

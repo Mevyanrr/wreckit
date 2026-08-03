@@ -11,7 +11,7 @@ class HistoryDateHeader extends StatelessWidget {
     this.isFirst = false,
   });
 
-  bool get _isPill => label == 'TODAY';
+  bool get _isPill => label == 'HARI INI';
 
 @override
 Widget build(BuildContext context) {

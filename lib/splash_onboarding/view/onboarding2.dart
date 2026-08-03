@@ -30,10 +30,10 @@ class Onboarding2 extends StatelessWidget {
               SizedBox(height: 28.h),
 
               Text(
-                'Before You Begin',
+                'Sebelum Anda Memulai',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 23.sp,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                   height: 1.2,
@@ -52,14 +52,19 @@ class Onboarding2 extends StatelessWidget {
                     height: 1.55,
                   ),
                   children: [
-                    const TextSpan(
-                      text: 'QRisk needs camera access to scan QR codes.\n',
-                    ),
                     TextSpan(
-                      text: "Here's our privacy commitment.",
+                      text: 'QRisk membutuhkan akses kamera untuk memindai kode QR.\n',
+
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                    
+                    TextSpan(
+                      text: "di bawah ini komitmen privasi kami.",
                       style: TextStyle(
                         color: Appcolors.onboard,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         fontSize: 12.sp,
                       ),
                     ),
@@ -71,32 +76,32 @@ class Onboarding2 extends StatelessWidget {
 
               _PermissionCard(
                 icon: Icons.camera_alt_outlined,
-                title: 'Camera Access',
+                title: 'Akses Kamera',
                 description:
-                    'Used only to scan QR codes. Your visual data is processed in real-time and is never recorded or stored on disk.',
+                    'Digunakan hanya untuk memindai kode QR. Data visual Anda diproses secara real-time dan tidak pernah direkam atau disimpan di disk.',
               ),
 
               SizedBox(height: 12.h),
 
               _PermissionCard(
                 icon: Icons.location_off_outlined,
-                title: 'No Location Data',
+                title: 'Tidak Ada Data Lokasi',
                 description:
-                    'QRisk never requests or stores your GPS coordinates. Forensic analysis is metadata-driven only.',
+                    'QRisk tidak pernah meminta atau menyimpan koordinat GPS Anda. Analisis forensik hanya didasarkan pada metadata.',
               ),
 
               SizedBox(height: 12.h),
 
               _PermissionCard(
                 icon: Icons.notifications_active_outlined,
-                title: 'Threat Notifications',
+                title: 'Notifikasi Ancaman',
                 description:
-                    'Optional forensic alerts delivered locally to your device when high-risk malicious codes are detected.',
+                    'Peringatan forensik opsional yang dikirim secara lokal ke perangkat Anda ketika kode berbahaya berisiko tinggi terdeteksi.',
               ),
 
               SizedBox(height: 16.h),
 
-              const _PrivacyBanner(),
+              _PrivacyBanner(),
 
               SizedBox(height: 24.h),
 
@@ -119,7 +124,7 @@ class Onboarding2 extends StatelessWidget {
                       Icon(Icons.camera_alt_outlined, size: 20.r),
                       SizedBox(width: 8.w),
                       Text(
-                        'Enable Camera Access',
+                        'Akses Kamera',
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
@@ -354,7 +359,7 @@ class _PrivacyBanner extends StatelessWidget {
           SizedBox(width: 10.w),
           Expanded(
             child: Text(
-              'ALL ANALYSIS RUNS ON-DEVICE. YOUR QR SCAN DATA IS NEVER UPLOADED TO EXTERNAL SERVERS.',
+              'SEMUA ANALISIS BERJALAN DI PERANGKAT. DATA PINDAIAN QR ANDA TIDAK PERNAH DIUNGGAH KE SERVER EKSTERNAL.',
               style: TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
