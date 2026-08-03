@@ -43,3 +43,34 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment variables & secrets (CRITICAL!)
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# SQLite Database files
+*.db
+*.sqlite3
+*.db-journal
+
+# Byte-compiled / Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE & Editor folders
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
