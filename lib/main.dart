@@ -6,10 +6,8 @@ import 'package:wreckit/main_feature/viewmodels/history_vm.dart';
 import 'package:wreckit/main_feature/viewmodels/scanner_vm.dart';
 import 'package:wreckit/main_feature/views/history_page.dart';
 import 'package:wreckit/main_feature/views/scanner_page.dart';
-import 'package:wreckit/scan_result/viewmodels/blockreported_vm.dart';
-import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
-import 'package:wreckit/scan_result/views/block_reported.dart'; 
-import 'package:wreckit/scan_result/views/scanresult_page.dart';
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
+import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/splash_onboarding/view/onboarding1.dart';
 import 'package:wreckit/splash_onboarding/view/onboarding2.dart';
 
@@ -21,7 +19,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +29,9 @@ class MyApp extends StatelessWidget {
           create: (_) => ScannerViewModel(),
         ),
         ChangeNotifierProvider<ScanResultViewModel>(
-          create: (_) => ScanResultViewModel(),
-        ),
-        ChangeNotifierProvider<BlockReportedViewModel>(
-          create: (_) => BlockReportedViewModel(),
+          create: (_) => ScanResultViewModel(
+            ScanResultModel.waspada(url: ''),
+          ),
         ),
         ChangeNotifierProvider<ScanHistoryViewModel>(
           create: (_) => ScanHistoryViewModel(),
@@ -51,16 +48,13 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,
-              // scaffoldBackgroundColor: Appcolors.primaryColor,
             ),
-            initialRoute: '/onboarding1', 
+            initialRoute: '/onboarding1',
             routes: {
               '/onboarding1': (context) => const Onboarding1(),
               '/onboarding2': (context) => const Onboarding2(),
               '/scanner': (context) => const ScannerPage(),
               '/history': (context) => const ScanHistoryPage(),
-              '/scan_result': (context) => const ScanResultPage(),
-              '/block_reported': (context) => const BlockReportedPage(),
             },
           );
         },

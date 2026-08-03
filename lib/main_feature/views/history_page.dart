@@ -54,7 +54,7 @@ class _HistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       title: Text(
-        'Scan History',
+        'Riwayat Memindai',
         style: TextStyle(
           color: Appcolors.textPrimary,
           fontSize: 17.sp,

@@ -9,7 +9,8 @@ import 'package:wreckit/main_feature/widgets/animation_scan.dart';
 import 'package:wreckit/main_feature/widgets/background.dart';
 import 'package:wreckit/main_feature/widgets/corner_scan.dart';
 import 'package:wreckit/main_feature/widgets/scannercontrol_button.dart';
-import 'package:wreckit/scan_result/viewmodels/analysysandresult_vm.dart';
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
+import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
 
 class ScannerPage extends StatefulWidget {
@@ -45,6 +46,7 @@ class _ScannerPageState extends State<ScannerPage>
     _fadeController.dispose();
     super.dispose();
   }
+
   void _showLoadingDialog(String message) {
     showDialog(
       context: context,
@@ -89,15 +91,26 @@ class _ScannerPageState extends State<ScannerPage>
 
   Future<void> _navigateToScanResult(String imagePath) async {
     if (!mounted) return;
+    final ScanResultModel result = _processScan(imagePath);
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider(
-          create: (_) => ScanResultViewModel()..loadScanResult(),
-          child: const ScanResultPage(),
+          create: (_) => ScanResultViewModel(result), 
+          child: ScanResultPage(result: result), 
         ),
       ),
     );
+  }
+
+  ScanResultModel _processScan(String path) {
+    if (path.contains('phishing') || path.contains('bit.ly')) {
+      return ScanResultModel.bahaya(url: path);
+    } else if (path.contains('suspicious') || path.contains('tinyurl')) {
+      return ScanResultModel.waspada(url: path);
+    }
+    return ScanResultModel.waspada(url: path);
   }
 
   Future<void> _onTapToScan() async {
@@ -110,7 +123,6 @@ class _ScannerPageState extends State<ScannerPage>
     _showLoadingDialog('Processing image...');
     await Future.delayed(const Duration(seconds: 2));
 
-    //simulasi save ke data be
     if (!mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); 
 
@@ -176,7 +188,7 @@ class _ScannerPageState extends State<ScannerPage>
                           SizedBox(height: 20.h),
 
                           Text(
-                            'Point camera at a QR code',
+                            'Arahkan kamera ke kode QR',
                             style: TextStyle(
                               color: Appcolors.textMuted,
                               fontSize: 14.sp,
@@ -366,7 +378,7 @@ class _TapToScanButton extends StatelessWidget {
                 ),
               )
             : Text(
-                'Tap to Scan',
+                'Klik untuk memindai',
                 style: TextStyle(
                   color: Appcolors.accentTeal,
                   fontSize: 15.sp,
@@ -465,7 +477,7 @@ class _BottomControls extends StatelessWidget {
             ),
           ),
           Text(
-            'SCANNER CONTROLS',
+            'KONTROL PEMINDAI',
             style: TextStyle(
               color: Appcolors.textMuted,
               fontSize: 10.sp,
@@ -479,18 +491,18 @@ class _BottomControls extends StatelessWidget {
             children: [
               ScannerControlButton(
                 icon: Icons.flashlight_on_rounded,
-                label: 'Torch',
+                label: 'Flash',
                 isActive: isTorchOn,
                 onTap: onTorch,
               ),
               ScannerControlButton(
                 icon: Icons.upload_file_rounded,
-                label: 'Upload',
+                label: 'Unggah',
                 onTap: onUpload,
               ),
               ScannerControlButton(
                 icon: Icons.history_rounded,
-                label: 'History',
+                label: 'Riwayat',
                 onTap: onHistory,
               ),
             ],
