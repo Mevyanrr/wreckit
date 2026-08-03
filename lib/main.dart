@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
             ScanResultModel.waspada(url: ''),
           ),
         ),
-        ChangeNotifierProvider<ScanHistoryViewModel>(
-          create: (_) => ScanHistoryViewModel(),
+        ChangeNotifierProvider<HistoryViewModel>(
+          create: (_) => HistoryViewModel(),
         ),
       ],
       child: ScreenUtilInit(
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
               '/onboarding1': (context) => const Onboarding1(),
               '/onboarding2': (context) => const Onboarding2(),
               '/scanner': (context) => const ScannerPage(),
-              '/history': (context) => const ScanHistoryPage(),
+              '/history': (context) => const HistoryPage(),
             },
           );
         },

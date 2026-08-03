@@ -46,6 +46,8 @@ dependencies:
   cloud_firestore: ^6.6.0
   isar_community: *isar_version
   isar_community_flutter_libs: *isar_version
+  http: ^1.2.0
+  google_mlkit_barcode_scanning: ^0.12.0
 
 dev_dependencies:
   flutter_test:

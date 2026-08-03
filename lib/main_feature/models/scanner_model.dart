@@ -69,4 +69,40 @@ class ScanHistoryItem {
 
   // Format skor 2 digit (misal: 05, 50, 90)
   String get formattedScore => riskScore.toString().padLeft(2, '0');
+
+  factory ScanHistoryItem.fromBackendMap(Map<String, dynamic> json) {
+  final String rawUrl = json['scanned_url']?.toString() ?? '';
+  final String verdict = json['verdict']?.toString().toUpperCase() ?? 'AMAN';
+  final String id = json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+  
+  // Parse timestamp string safely
+  DateTime scannedAt = DateTime.now();
+  if (json['created_at'] != null) {
+    try {
+      scannedAt = DateTime.parse(json['created_at']);
+    } catch (_) {}
+  }
+
+  // Create the nested ScanResultModel based on verdict
+  ScanResultModel resultModel;
+  switch (verdict) {
+    case 'BAHAYA':
+      resultModel = ScanResultModel.bahaya(url: rawUrl);
+      break;
+    case 'WASPADA':
+      resultModel = ScanResultModel.waspada(url: rawUrl);
+      break;
+    case 'AMAN':
+    default:
+      resultModel = ScanResultModel.aman(url: rawUrl);
+      break;
+  }
+
+  return ScanHistoryItem(
+    id: id,
+    imagePath: '', // Fallback empty string will trigger thumbnail placeholder safely
+    scannedAt: scannedAt,
+    scanResult: resultModel,
+  );
+}
 }

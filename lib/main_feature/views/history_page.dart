@@ -1,176 +1,80 @@
+// lib/main_feature/views/history_page.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import 'package:wreckit/core/AppColors.dart';
-import 'package:wreckit/main_feature/viewmodels/history_vm.dart';
-import 'package:wreckit/main_feature/widgets/history_card.dart';
-import 'package:wreckit/main_feature/widgets/history_date.dart';
-import '../models/scanner_model.dart';
+import '../viewmodels/history_vm.dart';
+import '../widgets/history_card.dart'; // Contains HistoryItemCard
+import '../models/scanner_model.dart'; // Contains ScanHistoryItem
 
-class ScanHistoryPage extends StatefulWidget {
-  const ScanHistoryPage({super.key});
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  State<ScanHistoryPage> createState() => _ScanHistoryPageState();
+  State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _ScanHistoryPageState extends State<ScanHistoryPage> {
+class _HistoryPageState extends State<HistoryPage> {
+  final HistoryViewModel _viewModel = HistoryViewModel();
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ScanHistoryViewModel>().loadDummy();
-    });
+    _viewModel.loadHistory();
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1520),
-      appBar: _HistoryAppBar(),
-      body: const _HistoryBody(),
-    );
-  }
-}
-
-class _HistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
-  @override
-  Size get preferredSize => Size.fromHeight(56.h);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: const Color(0xFF0D1520),
-      elevation: 0,
-      leading: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
-        child: Padding(
-          padding: EdgeInsets.only(left: 12.w),
-          child: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Appcolors.textPrimary,
-            size: 20.sp,
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text("Scan History"),
+        backgroundColor: const Color(0xFF0F1826),
       ),
-      title: Text(
-        'Riwayat Memindai',
-        style: TextStyle(
-          color: Appcolors.textPrimary,
-          fontSize: 17.sp,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
-        ),
-      ),
-      centerTitle: true,
-    );
-  }
-}
+      backgroundColor: const Color(0xFF0F1826),
+      body: ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, child) {
+          if (_viewModel.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-class _HistoryBody extends StatelessWidget {
-  const _HistoryBody();
+          if (_viewModel.errorMessage != null) {
+            return Center(
+              child: Text(
+                _viewModel.errorMessage!,
+                style: const TextStyle(color: Colors.white70),
+              ),
+            );
+          }
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ScanHistoryViewModel>(
-      builder: (context, vm, _) {
-        if (vm.isLoading) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: const Color(0xFF5DADE2),
-              strokeWidth: 2.5.w,
+          if (_viewModel.historyList.isEmpty) {
+            return const Center(
+              child: Text(
+                "No scan history found.",
+                style: TextStyle(color: Colors.white70),
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => _viewModel.loadHistory(),
+            child: ListView.builder(
+              itemCount: _viewModel.historyList.length,
+              itemBuilder: (context, index) {
+                final rawData = _viewModel.historyList[index] as Map<String, dynamic>;
+
+                final historyItem = ScanHistoryItem.fromBackendMap(rawData);
+
+                return HistoryItemCard(
+                  item: historyItem,
+                );
+              },
             ),
           );
-        }
-        if (vm.errorMessage != null) return _ErrorState(message: vm.errorMessage!);
-        if (vm.isEmpty) return const _EmptyState();
-
-        final groups = vm.groupedHistory;
-
-        return ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.only(bottom: 32.h),
-          itemCount: groups.fold<int>(0, (sum, g) => sum + 1 + g.items.length),
-          itemBuilder: (context, index) {
-            int remaining = index;
-            for (int gi = 0; gi < groups.length; gi++) {
-              final group = groups[gi];
-              if (remaining == 0) {
-                return HistoryDateHeader(label: group.label, isFirst: gi == 0);
-              }
-              remaining--;
-              if (remaining < group.items.length) {
-                final item = group.items[remaining];
-                return HistoryItemCard(
-                  item: item,
-                  onTap: () => _onItemTap(context, item),
-                );
-              }
-              remaining -= group.items.length;
-            }
-            return const SizedBox.shrink();
-          },
-        );
-      },
-    );
-  }
-
-  void _onItemTap(BuildContext context, ScanHistoryItem item) {
-    debugPrint('Tapped: ${item.id} — ${item.displayLabel}');
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.history_rounded, size: 56.sp, color: const Color(0xFF2A3A55)),
-          SizedBox(height: 16.h),
-          Text(
-            'Belum ada riwayat scan',
-            style: TextStyle(
-              color: const Color(0xFF6B7A99),
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            'Scan QR code untuk memulai',
-            style: TextStyle(color: const Color(0xFF3D4F6E), fontSize: 13.sp),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final String message;
-  const _ErrorState({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline_rounded, size: 48.sp, color: const Color(0xFFFF5252)),
-            SizedBox(height: 12.h),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: const Color(0xFF6B7A99), fontSize: 14.sp),
-            ),
-          ],
-        ),
+        },
       ),
     );
   }

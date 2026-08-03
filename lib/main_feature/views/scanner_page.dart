@@ -1,3 +1,4 @@
+// lib/main_feature/views/scanner_page.dart
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,7 @@ import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/scan_result/views/scanresult_page.dart';
 
 class ScannerPage extends StatefulWidget {
-  const ScannerPage({Key? key}) : super(key: key);
+  const ScannerPage({super.key});
 
   @override
   State<ScannerPage> createState() => _ScannerPageState();
@@ -89,72 +90,64 @@ class _ScannerPageState extends State<ScannerPage>
     );
   }
 
-  Future<void> _navigateToScanResult(String imagePath) async {
+  void _navigateToScanResult(ScanResultModel resultModel) {
     if (!mounted) return;
-    final ScanResultModel result = _processScan(imagePath);
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider(
-          create: (_) => ScanResultViewModel(result), 
-          child: ScanResultPage(result: result), 
+          create: (_) => ScanResultViewModel(resultModel),
+          child: ScanResultPage(result: resultModel),
         ),
       ),
     );
-  }
-
-  ScanResultModel _processScan(String path) {
-    if (path.contains('phishing') || path.contains('bit.ly')) {
-      return ScanResultModel.bahaya(url: path);
-    } else if (path.contains('suspicious') || path.contains('tinyurl')) {
-      return ScanResultModel.waspada(url: path);
-    }
-    return ScanResultModel.waspada(url: path);
   }
 
   Future<void> _onTapToScan() async {
     HapticFeedback.mediumImpact();
     final vm = context.read<ScannerViewModel>();
 
-    final path = await vm.captureImage();
-    if (path == null || !mounted) return;
+    final imagePath = await vm.captureImage();
+    if (imagePath == null) return;
 
-    _showLoadingDialog('Processing image...');
-    await Future.delayed(const Duration(seconds: 2));
+    final extractedUrl = await vm.extractUrlFromImage(imagePath);
+    if (extractedUrl == null) {
+      // Show error: "No QR code found in image"
+      return;
+    }
 
-    if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop(); 
-
-    _showLoadingDialog('Saving scan data...');
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop();
-
-    await _navigateToScanResult(path);
+    // Now send the actual extracted URL to FastAPI
+    final resultModel = await vm.analyzeScannedUrl(extractedUrl);
   }
 
   Future<void> _onUpload() async {
     HapticFeedback.lightImpact();
     final vm = context.read<ScannerViewModel>();
 
-    final path = await vm.pickFileFromDevice();
-    if (path == null || !mounted) return;
+    // 1. Pick file or image
+    final filePath = await vm.pickFileFromDevice();
+    if (filePath == null || !mounted) return;
 
-    _showLoadingDialog('Processing file...');
-    await Future.delayed(const Duration(seconds: 2));
+    _showLoadingDialog('Menganalisis file dengan FastAPI...');
 
-    if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop();
+    // 2. Send extracted path/URL to backend
+    final ScanResultModel? resultModel = await vm.analyzeScannedUrl(filePath);
 
-    _showLoadingDialog('Saving scan data...');
-    await Future.delayed(const Duration(seconds: 1));
+    // Dismiss loading dialog
+    if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
-    if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).pop();
-
-    await _navigateToScanResult(path);
+    // 3. Navigate or show error
+    if (resultModel != null && mounted) {
+      _navigateToScanResult(resultModel);
+    } else if (vm.errorMessage != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(vm.errorMessage!),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   void _onHistory() {

@@ -1,14 +1,17 @@
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
 import 'package:wreckit/main_feature/models/scanner_model.dart';
+import 'package:wreckit/scan_result/models/scanresult_model.dart';
+import 'package:wreckit/services/api_service.dart';
+import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
 class ScannerViewModel extends ChangeNotifier {
   ScannerModel _state = const ScannerModel();
   CameraController? _cameraController;
   List<CameraDescription> _cameras = [];
   bool _isCameraInitialized = false;
+  bool _isAnalyzing = false; // Tracks network API call state
   String? _errorMessage;
 
   ScannerModel get state => _state;
@@ -16,6 +19,7 @@ class ScannerViewModel extends ChangeNotifier {
   bool get isCameraInitialized => _isCameraInitialized;
   bool get isTorchOn => _state.isTorchOn;
   bool get isScanning => _state.isScanning;
+  bool get isAnalyzing => _isAnalyzing;
   String? get errorMessage => _errorMessage;
 
   Future<void> initCamera() async {
@@ -106,10 +110,66 @@ class ScannerViewModel extends ChangeNotifier {
     }
   }
 
+  Future<String?> extractUrlFromImage(String filePath) async {
+    final inputImage = InputImage.fromFilePath(filePath);
+    final barcodeScanner = BarcodeScanner(formats: [BarcodeFormat.qrCode]);
+
+    final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
+    await barcodeScanner.close();
+
+    if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
+      return barcodes.first.rawValue; // Returns the actual scanned URL! (e.g. "https://example.com")
+    }
+    return null;
+  }
+
+  // Send raw scanned QR URL payload to FastAPI backend proxy
+  Future<ScanResultModel?> analyzeScannedUrl(String rawUrl, {double heuristicScore = 0.0}) async {
+    if (_isAnalyzing) return null;
+
+    _isAnalyzing = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // 1. Post scanned URL to FastAPI backend
+      final responseData = await ApiService.scanUrl(
+        url: rawUrl,
+        heuristicScore: heuristicScore,
+      );
+
+      // 2. Extract fields from backend response
+      final String verdict = (responseData['verdict'] as String?)?.toUpperCase() ?? 'AMAN';
+      final String resolvedUrl = responseData['resolved_url'] ?? rawUrl;
+
+      // 3. Map backend verdict to ScanResultModel factory
+      ScanResultModel resultModel;
+      switch (verdict) {
+        case 'BAHAYA':
+          resultModel = ScanResultModel.bahaya(url: resolvedUrl);
+          break;
+        case 'WASPADA':
+          resultModel = ScanResultModel.waspada(url: resolvedUrl);
+          break;
+        case 'AMAN':
+        default:
+          resultModel = ScanResultModel.aman(url: resolvedUrl);
+          break;
+      }
+
+      return resultModel;
+    } catch (e) {
+      _errorMessage = 'Analysis failed: $e';
+      return null;
+    } finally {
+      _isAnalyzing = false;
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     _cameraController?.dispose();
     super.dispose();
   }
 }
-
