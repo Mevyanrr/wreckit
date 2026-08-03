@@ -34,8 +34,8 @@ class ScanHistoryItem {
   final String id;
   final String imagePath;
   final DateTime scannedAt;
-final ScanResultModel? scanResult;
- 
+  final ScanResultModel? scanResult;
+
   const ScanHistoryItem({
     required this.id,
     required this.imagePath,
@@ -43,21 +43,30 @@ final ScanResultModel? scanResult;
     this.scanResult,
   });
 
+  RiskLevel get riskLevel {
+    switch (status) {
+      case ScanStatus.bahaya:
+        return RiskLevel.critical;
+      case ScanStatus.waspada:
+        return RiskLevel.suspicious;
+      case ScanStatus.aman:
+      default:
+        return RiskLevel.safe;
+    }
+  }
 
-String get displayLabel {
+  String get displayLabel {
     if (scanResult == null) return id;
-    final url = scanResult!.targetUrl
+    final url = scanResult!.url
         .replaceFirst(RegExp(r'https?://'), '')
         .replaceFirst(RegExp(r'www\.'), '');
     return url.length > 22 ? '${url.substring(0, 22)}…' : url;
   }
- 
+
   int get riskScore => scanResult?.riskScore ?? 0;
- 
-  String get riskStatus => scanResult?.riskStatus ?? 'safe';
- 
-  RiskLevel get riskLevel => RiskLevelX.fromStatus(riskStatus);
- 
-  /// Score dengan zero-padding dua digit, e.g. "02", "91"
+
+  ScanStatus get status => scanResult?.status ?? ScanStatus.aman;
+
+  // Format skor 2 digit (misal: 05, 50, 90)
   String get formattedScore => riskScore.toString().padLeft(2, '0');
 }

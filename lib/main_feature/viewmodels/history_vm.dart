@@ -23,134 +23,94 @@ class ScanHistoryViewModel extends ChangeNotifier {
     final now = DateTime.now();
 
     _items = [
-      ScanHistoryItem(
-        id: '1',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(hours: 1)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://bit.ly/3xQ9mK',
-          riskScore: 91,
-          riskStatus: 'critical',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '2',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(hours: 3)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://www.bca.co.id/produk/kartu-debit',
-          riskScore: 2,
-          riskStatus: 'safe',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '3',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(hours: 5)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://tokopedia.com/promo/flash-sale',
-          riskScore: 38,
-          riskStatus: 'suspicious',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
+  // --- Hari Ini ---
+  ScanHistoryItem(
+    id: '1',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(hours: 1)),
+    scanResult: ScanResultModel.bahaya(
+      url: 'https://bit.ly/3xQ9mK',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '2',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(hours: 3)),
+    scanResult: ScanResultModel.aman(
+      url: 'https://www.bca.co.id/produk/kartu-debit',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '3',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(hours: 5)),
+    scanResult: ScanResultModel.waspada(
+      url: 'https://tokopedia.com/promo/flash-sale',
+    ),
+  ),
 
-      
-      ScanHistoryItem(
-        id: '4',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(days: 1, hours: 2)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://free-rewards.claims/get-prize',
-          riskScore: 64,
-          riskStatus: 'suspicious',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '5',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(days: 1, hours: 6)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://shopee.co.id/product/123456',
-          riskScore: 5,
-          riskStatus: 'safe',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '6',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(days: 1, hours: 10)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://phishing-bank.xyz/login/verify',
-          riskScore: 95,
-          riskStatus: 'critical',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
+  // --- Kemarin ---
+  ScanHistoryItem(
+    id: '4',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(days: 1, hours: 2)),
+    scanResult: ScanResultModel.waspada(
+      url: 'https://free-rewards.claims/get-prize',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '5',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(days: 1, hours: 6)),
+    scanResult: ScanResultModel.aman(
+      url: 'https://shopee.co.id/product/123456',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '6',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(days: 1, hours: 10)),
+    scanResult: ScanResultModel.bahaya(
+      url: 'https://phishing-bank.xyz/login/verify',
+    ),
+  ),
 
-      
-      ScanHistoryItem(
-        id: '7',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(days: 3)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://amazon.com/warehouse/deals',
-          riskScore: 5,
-          riskStatus: 'safe',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '8',
-        imagePath: '',
-        scannedAt: now.subtract(const Duration(days: 3, hours: 4)),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://tinyurl.com/win-iphone15',
-          riskScore: 77,
-          riskStatus: 'suspicious',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
+  // --- 3 Hari Lalu ---
+  ScanHistoryItem(
+    id: '7',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(days: 3)),
+    scanResult: ScanResultModel.aman(
+      url: 'https://amazon.com/warehouse/deals',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '8',
+    imagePath: '',
+    scannedAt: now.subtract(const Duration(days: 3, hours: 4)),
+    scanResult: ScanResultModel.waspada(
+      url: 'https://tinyurl.com/win-iphone15',
+    ),
+  ),
 
-   
-      ScanHistoryItem(
-        id: '9',
-        imagePath: '',
-        scannedAt: DateTime(2024, 11, 14, 9, 30),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://grab.com/id/promo/voucher',
-          riskScore: 8,
-          riskStatus: 'safe',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-      ScanHistoryItem(
-        id: '10',
-        imagePath: '',
-        scannedAt: DateTime(2024, 11, 14, 15, 45),
-        scanResult: ScanResultModel(
-          targetUrl: 'https://secure-gateway.link/redirect?id=8f3a',
-          riskScore: 82,
-          riskStatus: 'critical',
-          details: [],
-          redirectChain: [],
-        ),
-      ),
-    ];
-
+  // --- Tanggal Spesifik ---
+  ScanHistoryItem(
+    id: '9',
+    imagePath: '',
+    scannedAt: DateTime(2024, 11, 14, 9, 30),
+    scanResult: ScanResultModel.aman(
+      url: 'https://grab.com/id/promo/voucher',
+    ),
+  ),
+  ScanHistoryItem(
+    id: '10',
+    imagePath: '',
+    scannedAt: DateTime(2024, 11, 14, 15, 45),
+    scanResult: ScanResultModel.bahaya(
+      url: 'https://secure-gateway.link/redirect?id=8f3a',
+    ),
+  ),
+];
     notifyListeners();
   }
 
@@ -196,9 +156,9 @@ class ScanHistoryViewModel extends ChangeNotifier {
       );
       String label;
       if (d == today) {
-        label = 'TODAY';
+        label = 'HARI INI';
       } else if (d == yesterday) {
-        label = 'YESTERDAY';
+        label = 'KEMARIN';
       } else {
         label = _formatDate(d);
       }
