@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from database import ScanHistory, create_db_and_tables, get_session
 from services.checker import evaluate_url_safety
+from services.resolver import resolve_url_redirects  # <--- Import resolver
 
 load_dotenv()
 
@@ -22,18 +23,24 @@ class ScanPayload(BaseModel):
     url: str
     heuristic_score: float = 0.0
 
-# ----------------------------------------------------
-# REAL-TIME SCAN ENDPOINT
-# ----------------------------------------------------
 @app.post("/api/v1/scan")
 async def scan_qr_code(payload: ScanPayload, session: Session = Depends(get_session)):
-    # 1. Run parallel threat checks
-    result = await evaluate_url_safety(payload.url, payload.heuristic_score)
+    # 1. Resolve URL shortener redirect chain first
+    resolution = await resolve_url_redirects(payload.url)
+    target_url = resolution["resolved_url"]
+
+    # 2. Run parallel threat checks on the resolved target URL
+    result = await evaluate_url_safety(target_url, payload.heuristic_score)
     
-    # 2. Save result into history database
+    # Enrich response with redirect metadata
+    result["original_url"] = payload.url
+    result["is_redirected"] = resolution["is_redirected"]
+    result["redirect_chain"] = resolution["redirect_chain"]
+
+    # 3. Save result into history database
     history_entry = ScanHistory(
-        scanned_url=result["scanned_url"],
-        resolved_url=result["resolved_url"],
+        scanned_url=payload.url,          # Original short link scanned
+        resolved_url=target_url,          # Final expanded target URL
         risk_score=result["risk_score"],
         verdict=result["verdict"]
     )
@@ -42,9 +49,6 @@ async def scan_qr_code(payload: ScanPayload, session: Session = Depends(get_sess
     
     return result
 
-# ----------------------------------------------------
-# GET HISTORY ENDPOINT
-# ----------------------------------------------------
 @app.get("/api/v1/history", response_model=List[ScanHistory])
 async def get_history(
     verdict: Optional[str] = Query(None, description="Filter by AMAN, WASPADA, or BAHAYA"),

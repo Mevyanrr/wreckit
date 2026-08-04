@@ -109,41 +109,83 @@ class _ScannerPageState extends State<ScannerPage>
     final vm = context.read<ScannerViewModel>();
 
     final imagePath = await vm.captureImage();
-    if (imagePath == null) return;
+    if (imagePath == null || !mounted) return;
+
+    _showLoadingDialog('Mengekstrak QR code...');
 
     final extractedUrl = await vm.extractUrlFromImage(imagePath);
+
     if (extractedUrl == null) {
-      // Show error: "No QR code found in image"
+      if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop(); // Dismiss loading
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tidak ada QR code yang terdeteksi.'),
+            backgroundColor: Colors.orangeAccent,
+          ),
+        );
+      }
       return;
     }
 
-    // Now send the actual extracted URL to FastAPI
-    final resultModel = await vm.analyzeScannedUrl(extractedUrl);
+    // Send extracted URL to FastAPI backend
+    ScanResultModel? resultModel;
+    try {
+      resultModel = await vm.analyzeScannedUrl(extractedUrl);
+    } catch (e) {
+      debugPrint("Scan analysis error: $e");
+    } finally {
+      if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop(); // Dismiss loading
+      }
+    }
+
+    // Redirect to ScanResultPage!
+    if (resultModel != null && mounted) {
+      _navigateToScanResult(resultModel);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(vm.errorMessage ?? 'Gagal menganalisis URL.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   Future<void> _onUpload() async {
     HapticFeedback.lightImpact();
     final vm = context.read<ScannerViewModel>();
 
-    // 1. Pick file or image
     final filePath = await vm.pickFileFromDevice();
     if (filePath == null || !mounted) return;
 
-    _showLoadingDialog('Menganalisis file dengan FastAPI...');
+    _showLoadingDialog('Mengekstrak & menganalisis file...');
 
-    // 2. Send extracted path/URL to backend
-    final ScanResultModel? resultModel = await vm.analyzeScannedUrl(filePath);
+    // 1. Try to extract QR from picked file
+    final extractedUrl = await vm.extractUrlFromImage(filePath) ?? filePath;
 
-    // Dismiss loading dialog
-    if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    // 2. Send to backend
+    ScanResultModel? resultModel;
+    try {
+      resultModel = await vm.analyzeScannedUrl(extractedUrl);
+    } catch (e) {
+      debugPrint("Upload scan error: $e");
+    } finally {
+      if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop(); // Dismiss loading
+      }
+    }
 
-    // 3. Navigate or show error
+    // 3. Redirect to ScanResultPage!
     if (resultModel != null && mounted) {
       _navigateToScanResult(resultModel);
-    } else if (vm.errorMessage != null && mounted) {
+    } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(vm.errorMessage!),
+          content: Text(vm.errorMessage ?? 'Gagal menganalisis file.'),
           backgroundColor: Colors.redAccent,
         ),
       );
