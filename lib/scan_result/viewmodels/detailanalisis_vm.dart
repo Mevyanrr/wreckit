@@ -8,7 +8,9 @@ class AnalysisDetailViewModel extends ChangeNotifier {
   AnalysisDetailModel? _analysisDetail;
   AnalysisDetailModel? get analysisDetail => _analysisDetail;
 
-  AnalysisDetailViewModel() {
+  final String scannedUrl;
+
+  AnalysisDetailViewModel({required this.scannedUrl}) {
     fetchAnalysisDetail();
   }
 
@@ -21,7 +23,7 @@ class AnalysisDetailViewModel extends ChangeNotifier {
     _analysisDetail = AnalysisDetailModel(
       status: 'AMAN',
       riskScore: 12,
-      scannedUrl: 'menu.restoran.com',
+      scannedUrl: scannedUrl, // <-- Uses the passed scanned URL here
       systemSummaries: [
         'Domain telah terdaftar lebih dari 3 tahun dan memiliki reputasi baik.',
         'Sertifikat SSL valid dan diterbitkan oleh otoritas terpercaya.',

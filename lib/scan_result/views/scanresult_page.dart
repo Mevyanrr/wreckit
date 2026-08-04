@@ -97,7 +97,9 @@ class _ScanResultView extends StatelessWidget {
                   UrlAnalyzedCard(result: result, viewModel: vm),
                   if (result.status != ScanStatus.aman) ...[
                     SizedBox(height: 14.h),
-                    _DetailAnalysisButton(),
+                    _DetailAnalysisButton(
+                      scannedUrl: result.url
+                    ),
                   ],
                   SizedBox(height: 24.h),
                 ],
@@ -116,20 +118,29 @@ class _ScanResultView extends StatelessWidget {
 }
 
 class _DetailAnalysisButton extends StatelessWidget {
+  final String scannedUrl;
+
+  const _DetailAnalysisButton({
+    super.key,
+    required this.scannedUrl,
+  });
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(14.r),
       onTap: () {
         Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => ChangeNotifierProvider(
-      create: (_) => AnalysisDetailViewModel(),
-      child: const DetailAnalisisScreen(),
-    ),
-  ),
-);
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider(
+              create: (_) => AnalysisDetailViewModel(
+                scannedUrl: scannedUrl, // <-- Pass the scanned URL here!
+              ),
+              child: const DetailAnalisisScreen(),
+            ),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,
@@ -145,13 +156,17 @@ class _DetailAnalysisButton extends StatelessWidget {
             Text(
               'Lihat Detail Analisis',
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600),
+                color: Colors.white,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             SizedBox(width: 6.w),
-            Icon(Icons.chevron_right_rounded,
-                color: Colors.white, size: 18.sp),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white,
+              size: 18.sp,
+            ),
           ],
         ),
       ),

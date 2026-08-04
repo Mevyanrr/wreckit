@@ -13,7 +13,8 @@ IPQS_API_KEY = os.getenv("IPQS_API_KEY", "")
 # -------------------------------------------------------------------------
 async def check_virustotal(client: httpx.AsyncClient, url: str) -> dict:
     if not VIRUSTOTAL_API_KEY:
-        return {"malicious": 0, "suspicious": 0, "status": "skipped"}
+            print("[CHECKER] VirusTotal: SKIPPED (API Key missing or empty)")
+            return {"malicious": 0, "suspicious": 0, "status": "skipped"}
 
     import base64
     # VirusTotal v3 requires URL identifiers to be base64-encoded without padding '='
@@ -32,7 +33,10 @@ async def check_virustotal(client: httpx.AsyncClient, url: str) -> dict:
             }
     except Exception as e:
         print(f"VirusTotal Error: {e}")
-    
+
+    res = await client.get(api_url, headers=headers)
+    print(f"VT Response Status: {res.status_code}")
+
     return {"malicious": 0, "suspicious": 0, "status": "error"}
 
 # -------------------------------------------------------------------------
@@ -40,6 +44,7 @@ async def check_virustotal(client: httpx.AsyncClient, url: str) -> dict:
 # -------------------------------------------------------------------------
 async def check_google_safe_browsing(client: httpx.AsyncClient, url: str) -> dict:
     if not GSB_API_KEY:
+        print("[CHECKER] Google Safe Browsing: SKIPPED (API Key missing or empty)")
         return {"is_flagged": False, "threats": [], "status": "skipped"}
 
     api_url = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={GSB_API_KEY}"
@@ -67,6 +72,9 @@ async def check_google_safe_browsing(client: httpx.AsyncClient, url: str) -> dic
     except Exception as e:
         print(f"Google Safe Browsing Error: {e}")
 
+    res = await client.post(api_url, json=payload)
+    print(f"[CHECKER] Google Safe Browsing HTTP Status: {res.status_code}")
+
     return {"is_flagged": False, "threats": [], "status": "error"}
 
 # -------------------------------------------------------------------------
@@ -74,7 +82,8 @@ async def check_google_safe_browsing(client: httpx.AsyncClient, url: str) -> dic
 # -------------------------------------------------------------------------
 async def check_ipqs(client: httpx.AsyncClient, url: str) -> dict:
     if not IPQS_API_KEY:
-        return {"risk_score": 0, "unsafe": False, "phishing": False, "malware": False, "status": "skipped"}
+        print("[CHECKER] IPQS: SKIPPED (API Key missing or empty)")
+        return {"risk_score": 0, "unsafe": False, "status": "skipped"}
 
     encoded_url = quote(url, safe="")
     api_url = f"https://www.ipqualityscore.com/api/json/url/{IPQS_API_KEY}/{encoded_url}"
@@ -93,6 +102,9 @@ async def check_ipqs(client: httpx.AsyncClient, url: str) -> dict:
                 }
     except Exception as e:
         print(f"IPQS Error: {e}")
+
+    res = await client.get(api_url)
+    print(f"[CHECKER] IPQS HTTP Status: {res.status_code}")
 
     return {"risk_score": 0, "unsafe": False, "phishing": False, "malware": False, "status": "error"}
 
