@@ -67,6 +67,6 @@ class ScanHistoryItem {
 
   ScanStatus get status => scanResult?.status ?? ScanStatus.aman;
 
-  // Format skor 2 digit (misal: 05, 50, 90)
+
   String get formattedScore => riskScore.toString().padLeft(2, '0');
 }
