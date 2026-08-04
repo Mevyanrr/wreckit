@@ -138,22 +138,36 @@ class ScannerViewModel extends ChangeNotifier {
         heuristicScore: heuristicScore,
       );
 
+      print('DEBUG BACKEND RESPONSE: $responseData');
+
       // 2. Extract fields from backend response
       final String verdict = (responseData['verdict'] as String?)?.toUpperCase() ?? 'AMAN';
       final String resolvedUrl = responseData['resolved_url'] ?? rawUrl;
+      
+      // Extract risk score inside the method where responseData exists:
+      final int score = ((responseData['risk_score'] ?? responseData['score'] ?? responseData['riskScore']) as num?)?.toInt() ?? 0;
 
       // 3. Map backend verdict to ScanResultModel factory
       ScanResultModel resultModel;
       switch (verdict) {
         case 'BAHAYA':
-          resultModel = ScanResultModel.bahaya(url: resolvedUrl);
+          resultModel = ScanResultModel.bahaya(
+            url: resolvedUrl,
+            score: score,
+          );
           break;
         case 'WASPADA':
-          resultModel = ScanResultModel.waspada(url: resolvedUrl);
+          resultModel = ScanResultModel.waspada(
+            url: resolvedUrl,
+            score: score,
+          );
           break;
         case 'AMAN':
         default:
-          resultModel = ScanResultModel.aman(url: resolvedUrl);
+          resultModel = ScanResultModel.aman(
+            url: resolvedUrl,
+            score: score,
+          );
           break;
       }
 

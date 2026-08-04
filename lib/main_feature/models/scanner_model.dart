@@ -70,39 +70,42 @@ class ScanHistoryItem {
   // Format skor 2 digit (misal: 05, 50, 90)
   String get formattedScore => riskScore.toString().padLeft(2, '0');
 
-  factory ScanHistoryItem.fromBackendMap(Map<String, dynamic> json) {
-  final String rawUrl = json['scanned_url']?.toString() ?? '';
-  final String verdict = json['verdict']?.toString().toUpperCase() ?? 'AMAN';
-  final String id = json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
-  
-  // Parse timestamp string safely
-  DateTime scannedAt = DateTime.now();
-  if (json['created_at'] != null) {
-    try {
-      scannedAt = DateTime.parse(json['created_at']);
-    } catch (_) {}
-  }
+ factory ScanHistoryItem.fromBackendMap(Map<String, dynamic> json) {
+    final String rawUrl = json['scanned_url']?.toString() ?? '';
+    final String verdict = json['verdict']?.toString().toUpperCase() ?? 'AMAN';
+    final String id = json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+    
+    // Extract risk score safely from json
+    final int score = ((json['risk_score'] ?? json['score'] ?? json['riskScore']) as num?)?.toInt() ?? 0;
 
-  // Create the nested ScanResultModel based on verdict
-  ScanResultModel resultModel;
-  switch (verdict) {
-    case 'BAHAYA':
-      resultModel = ScanResultModel.bahaya(url: rawUrl);
-      break;
-    case 'WASPADA':
-      resultModel = ScanResultModel.waspada(url: rawUrl);
-      break;
-    case 'AMAN':
-    default:
-      resultModel = ScanResultModel.aman(url: rawUrl);
-      break;
-  }
+    // Parse timestamp string safely
+    DateTime scannedAt = DateTime.now();
+    if (json['created_at'] != null) {
+      try {
+        scannedAt = DateTime.parse(json['created_at']);
+      } catch (_) {}
+    }
 
-  return ScanHistoryItem(
-    id: id,
-    imagePath: '', // Fallback empty string will trigger thumbnail placeholder safely
-    scannedAt: scannedAt,
-    scanResult: resultModel,
-  );
-}
+    // Create the nested ScanResultModel based on verdict
+    ScanResultModel resultModel;
+    switch (verdict) {
+      case 'BAHAYA':
+        resultModel = ScanResultModel.bahaya(url: rawUrl, score: score);
+        break;
+      case 'WASPADA':
+        resultModel = ScanResultModel.waspada(url: rawUrl, score: score);
+        break;
+      case 'AMAN':
+      default:
+        resultModel = ScanResultModel.aman(url: rawUrl, score: score);
+        break;
+    }
+
+    return ScanHistoryItem(
+      id: id,
+      imagePath: '', // Fallback empty string will trigger thumbnail placeholder safely
+      scannedAt: scannedAt,
+      scanResult: resultModel,
+    );
+  }
 }

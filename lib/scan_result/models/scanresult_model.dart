@@ -78,7 +78,7 @@ class ScanResultModel {
         urlLabel: 'MALICIOUS URL DETECTED',
       );
 
-  factory ScanResultModel.aman({required String url, int score = 5}) =>
+  factory ScanResultModel.aman({required String url, required int score}) =>
       ScanResultModel(
         status: ScanStatus.aman,
         riskScore: score,
