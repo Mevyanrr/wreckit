@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 
 enum ScanStatus { bahaya, aman, waspada }
 
@@ -6,6 +6,7 @@ enum RiskLevel { safe, suspicious, critical }
 
 class ScanResultModel {
   final ScanStatus status;
+  final int riskScore; // Now dynamically populated from API response
   final String title;
   final String? subtitle;
   final String description;
@@ -15,6 +16,7 @@ class ScanResultModel {
 
   const ScanResultModel({
     required this.status,
+    required this.riskScore,
     required this.title,
     this.subtitle,
     required this.description,
@@ -24,17 +26,6 @@ class ScanResultModel {
   });
 
   String get targetUrl => url;
-
-  int get riskScore {
-    switch (status) {
-      case ScanStatus.bahaya:
-        return 90;
-      case ScanStatus.waspada:
-        return 50;
-      case ScanStatus.aman:
-        return 5;
-    }
-  }
 
   String get riskStatus {
     switch (status) {
@@ -47,8 +38,38 @@ class ScanResultModel {
     }
   }
 
-  factory ScanResultModel.bahaya({required String url}) => ScanResultModel(
+  // Determine status enum dynamically from a numeric risk score
+  static ScanStatus statusFromScore(int score) {
+    if (score >= 66) {
+      return ScanStatus.bahaya;
+    } else if (score >= 26) {
+      return ScanStatus.waspada;
+    } else {
+      return ScanStatus.aman;
+    }
+  }
+
+  // Dynamic constructor from JSON backend response
+  factory ScanResultModel.fromJson(Map<String, dynamic> json) {
+    final int score = (json['risk_score'] as num?)?.toInt() ?? 0;
+    final ScanStatus computedStatus = statusFromScore(score);
+    final String urlStr = json['scanned_url'] ?? json['url'] ?? '';
+
+    switch (computedStatus) {
+      case ScanStatus.bahaya:
+        return ScanResultModel.bahaya(url: urlStr, score: score);
+      case ScanStatus.waspada:
+        return ScanResultModel.waspada(url: urlStr, score: score);
+      case ScanStatus.aman:
+      default:
+        return ScanResultModel.aman(url: urlStr, score: score);
+    }
+  }
+
+  factory ScanResultModel.bahaya({required String url, int score = 90}) =>
+      ScanResultModel(
         status: ScanStatus.bahaya,
+        riskScore: score,
         title: 'Bahaya',
         subtitle: 'Situs Penipuan Ditemukan',
         description:
@@ -57,8 +78,10 @@ class ScanResultModel {
         urlLabel: 'MALICIOUS URL DETECTED',
       );
 
-  factory ScanResultModel.aman({required String url}) => ScanResultModel(
+  factory ScanResultModel.aman({required String url, int score = 5}) =>
+      ScanResultModel(
         status: ScanStatus.aman,
+        riskScore: score,
         title: 'Aman',
         description:
             'Tidak ada tanda-tanda penipuan. Tautan ini aman untuk dikunjungi.',
@@ -67,8 +90,10 @@ class ScanResultModel {
         badges: const ['SSL VERIFIED', 'NO PHISHING FOUND'],
       );
 
-  factory ScanResultModel.waspada({required String url}) => ScanResultModel(
+  factory ScanResultModel.waspada({required String url, int score = 50}) =>
+      ScanResultModel(
         status: ScanStatus.waspada,
+        riskScore: score,
         title: 'Waspada',
         description:
             'Tautan ini menggunakan alamat yang tidak biasa. Berhati-hatilah sebelum memasukkan data pribadi atau melakukan pembayaran.',
@@ -76,16 +101,17 @@ class ScanResultModel {
         urlLabel: 'URL TERANALISIS',
       );
 }
+
 extension RiskLevelExtension on RiskLevel {
   Color get color {
     switch (this) {
       case RiskLevel.critical:
-        return const Color(0xFFFF4C4C); 
+        return const Color(0xFFFF4C4C);
       case RiskLevel.suspicious:
-        return const Color(0xFFFFB020); 
+        return const Color(0xFFFFB020);
       case RiskLevel.safe:
       default:
-        return const Color(0xFF00E676); 
+        return const Color(0xFF00E676);
     }
   }
 
@@ -106,7 +132,7 @@ class EngineCheckItem {
   final String name;
   final int weightPercentage;
   final String description;
-  final double progress; 
+  final double progress;
   final IconData icon;
 
   EngineCheckItem({
