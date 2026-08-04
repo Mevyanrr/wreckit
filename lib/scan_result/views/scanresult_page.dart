@@ -98,7 +98,7 @@ class _ScanResultView extends StatelessWidget {
                   if (result.status != ScanStatus.aman) ...[
                     SizedBox(height: 14.h),
                     _DetailAnalysisButton(
-                      scannedUrl: result.url
+                      result: result
                     ),
                   ],
                   SizedBox(height: 24.h),
@@ -118,11 +118,11 @@ class _ScanResultView extends StatelessWidget {
 }
 
 class _DetailAnalysisButton extends StatelessWidget {
-  final String scannedUrl;
+  final ScanResultModel result;
 
   const _DetailAnalysisButton({
     super.key,
-    required this.scannedUrl,
+    required this.result,
   });
 
   @override
@@ -134,9 +134,7 @@ class _DetailAnalysisButton extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider(
-              create: (_) => AnalysisDetailViewModel(
-                scannedUrl: scannedUrl, // <-- Pass the scanned URL here!
-              ),
+              create: (_) => AnalysisDetailViewModel(result), // result is now defined
               child: const DetailAnalisisScreen(),
             ),
           ),

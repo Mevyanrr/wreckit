@@ -54,9 +54,7 @@ class ActionButtons extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider(
-          create: (_) => AnalysisDetailViewModel(
-            scannedUrl: viewModel.result.url
-          ),
+          create: (_) => AnalysisDetailViewModel(viewModel.result),
           child: const DetailAnalisisScreen(),
         ),
       ),
