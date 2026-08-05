@@ -93,10 +93,10 @@ class Onboarding2 extends StatelessWidget {
               SizedBox(height: 12.h),
 
               _PermissionCard(
-                icon: Icons.notifications_active_outlined,
-                title: 'Notifikasi Ancaman',
+                icon: Icons.shield_outlined,
+                title: 'Skor Keamanan',
                 description:
-                    'Peringatan forensik opsional yang dikirim secara lokal ke perangkat Anda ketika kode berbahaya berisiko tinggi terdeteksi.',
+                    'Setiap URL yang Anda scan langsung mendapatkan skor keamanan berdasarkan analisis forensik terhadap potensi kode berbahaya.',
               ),
 
               SizedBox(height: 16.h),

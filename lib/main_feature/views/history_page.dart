@@ -1,5 +1,7 @@
 // lib/main_feature/views/history_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:wreckit/core/AppColors.dart';
 import '../viewmodels/history_vm.dart';
 import '../widgets/history_card.dart';
 
@@ -25,13 +27,36 @@ class _HistoryPageState extends State<HistoryPage> {
     super.dispose();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Scan History"),
-        backgroundColor: const Color(0xFF0F1826),
+      backgroundColor: const Color(0xFF0D1520),
+      elevation: 0,
+      leading: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Padding(
+          padding: EdgeInsets.only(left: 12.w),
+          child: Icon(
+            Icons.arrow_back,
+            color: Appcolors.textPrimary,
+            size: 20.sp,
+          ),
+        ),
       ),
+      title: Text(
+        'Riwayat Memindai',
+        style: TextStyle(
+          color: Appcolors.textPrimary,
+          fontSize: 17.sp,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
+        ),
+      ),
+      centerTitle: true,
+    ),
       backgroundColor: const Color(0xFF0F1826),
       body: ListenableBuilder(
         listenable: _viewModel,

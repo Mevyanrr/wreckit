@@ -75,7 +75,9 @@ class ActionButtons extends StatelessWidget {
             ),
             SizedBox(height: 14.h),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                viewModel.openBrowser();
+              },
               child: Text(
                 'Buka (Tetap Hati-Hati)',
                 style: TextStyle(
