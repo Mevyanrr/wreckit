@@ -1,17 +1,19 @@
+// lib/main_feature/viewmodels/scanner_vm.dart
+import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:camera/camera.dart';
+import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:wreckit/main_feature/models/scanner_model.dart';
 import 'package:wreckit/scan_result/models/scanresult_model.dart';
 import 'package:wreckit/services/api_service.dart';
-import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
+import 'package:wreckit/services/db_service.dart';
 
 class ScannerViewModel extends ChangeNotifier {
   ScannerModel _state = const ScannerModel();
   CameraController? _cameraController;
   List<CameraDescription> _cameras = [];
   bool _isCameraInitialized = false;
-  bool _isAnalyzing = false; // Tracks network API call state
+  bool _isAnalyzing = false;
   String? _errorMessage;
 
   ScannerModel get state => _state;
@@ -118,13 +120,13 @@ class ScannerViewModel extends ChangeNotifier {
     await barcodeScanner.close();
 
     if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
-      return barcodes.first.rawValue; // Returns the actual scanned URL! (e.g. "https://example.com")
+      return barcodes.first.rawValue;
     }
     return null;
   }
 
-  // Send raw scanned QR URL payload to FastAPI backend proxy
-  Future<ScanResultModel?> analyzeScannedUrl(String rawUrl, {double heuristicScore = 0.0}) async {
+  // Send raw scanned URL payload directly to FastAPI backend
+  Future<ScanResultModel?> analyzeScannedUrl(String rawUrl) async {
     if (_isAnalyzing) return null;
 
     _isAnalyzing = true;
@@ -132,19 +134,14 @@ class ScannerViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Post scanned URL to FastAPI backend
-      final responseData = await ApiService.scanUrl(
-        url: rawUrl,
-        heuristicScore: heuristicScore,
-      );
+      // 1. Post scanned URL to FastAPI (Server runs ONNX + GSB)
+      final responseData = await ApiService.scanUrl(url: rawUrl);
 
       print('DEBUG BACKEND RESPONSE: $responseData');
 
       // 2. Extract fields from backend response
       final String verdict = (responseData['verdict'] as String?)?.toUpperCase() ?? 'AMAN';
       final String resolvedUrl = responseData['resolved_url'] ?? rawUrl;
-      
-      // Extract risk score inside the method where responseData exists:
       final int score = ((responseData['risk_score'] ?? responseData['score'] ?? responseData['riskScore']) as num?)?.toInt() ?? 0;
 
       // 3. Map backend verdict to ScanResultModel factory
@@ -170,6 +167,9 @@ class ScannerViewModel extends ChangeNotifier {
           );
           break;
       }
+
+      // 4. Save result to local SQLite DB
+      await DatabaseService.instance.insertScan(resultModel);
 
       return resultModel;
     } catch (e) {

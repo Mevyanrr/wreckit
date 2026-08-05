@@ -7,8 +7,7 @@ class ApiService {
   static const String baseUrl = "http://10.246.230.106:8000/api/v1";
 
   static Future<Map<String, dynamic>> scanUrl({
-    required String url,
-    double heuristicScore = 0.0,
+    required String url
   }) async {
     final uri = Uri.parse('$baseUrl/scan');
 
@@ -18,8 +17,7 @@ class ApiService {
             uri,
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
-              'url': url,
-              'heuristic_score': heuristicScore,
+              'url': url
             }),
           )
           .timeout(const Duration(seconds: 10));

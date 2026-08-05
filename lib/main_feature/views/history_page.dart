@@ -1,8 +1,7 @@
 // lib/main_feature/views/history_page.dart
 import 'package:flutter/material.dart';
 import '../viewmodels/history_vm.dart';
-import '../widgets/history_card.dart'; // Contains HistoryItemCard
-import '../models/scanner_model.dart'; // Contains ScanHistoryItem
+import '../widgets/history_card.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -64,9 +63,8 @@ class _HistoryPageState extends State<HistoryPage> {
             child: ListView.builder(
               itemCount: _viewModel.historyList.length,
               itemBuilder: (context, index) {
-                final rawData = _viewModel.historyList[index] as Map<String, dynamic>;
-
-                final historyItem = ScanHistoryItem.fromBackendMap(rawData);
+                // Directly access the pre-parsed ScanHistoryItem
+                final historyItem = _viewModel.historyList[index];
 
                 return HistoryItemCard(
                   item: historyItem,

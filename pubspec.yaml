@@ -18,7 +18,6 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # of the product and file versions while build-number is used as the build suffix.
 version: 1.0.0+1
 
-isar_version: &isar_version 3.3.2
 environment:
   sdk: ^3.11.5
 
@@ -31,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  tflite_flutter: ^0.11.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -44,16 +45,16 @@ dependencies:
   dio: ^5.9.2
   firebase_core: ^4.11.0
   cloud_firestore: ^6.6.0
-  isar_community: *isar_version
-  isar_community_flutter_libs: *isar_version
   http: ^1.2.0
   google_mlkit_barcode_scanning: ^0.12.0
+  sqflite: ^2.4.3
+  path: ^1.9.1
+  flutter_onnxruntime: ^1.8.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   
-  isar_community_generator: *isar_version
   build_runner: any
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -77,6 +78,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/image_onboarding.png
+    - assets/models/phishing_model_float32.tflite
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
