@@ -1,30 +1,29 @@
-// lib/main_feature/viewmodels/history_vm.dart
 import 'package:flutter/foundation.dart';
-import '../../services/api_service.dart';
+import 'package:wreckit/main_feature/models/scanner_model.dart';
+import 'package:wreckit/services/db_service.dart';
 
 class HistoryViewModel extends ChangeNotifier {
-  List<dynamic> _historyList = [];
+  List<ScanHistoryItem> _historyList = [];
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Getters for UI access
-  List<dynamic> get historyList => _historyList;
+  List<ScanHistoryItem> get historyList => _historyList;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // Fetch history from API and handle states
-  Future<void> loadHistory({String? verdict}) async {
+  Future<void> loadHistory() async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners(); // Tell UI we are loading
+    notifyListeners();
 
     try {
-      _historyList = await ApiService.fetchHistory(verdict: verdict);
+      // 1. Fetch entries directly from local SQLite database
+      _historyList = await DatabaseService.instance.getLocalHistory();
     } catch (e) {
-      _errorMessage = "Failed to load history: $e";
+      _errorMessage = 'Failed to load scan history: $e';
     } finally {
       _isLoading = false;
-      notifyListeners(); // Tell UI to rebuild with new data/error
+      notifyListeners();
     }
   }
 }

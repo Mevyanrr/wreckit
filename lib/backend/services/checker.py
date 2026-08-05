@@ -5,6 +5,7 @@ import httpx
 from urllib.parse import quote
 from typing import Dict, Any
 import random
+from services.classifier import ml_service
 
 VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY", "")
 GOOGLE_SAFE_BROWSING_API_KEY = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY", "")
@@ -131,31 +132,30 @@ async def check_ipqs(client: httpx.AsyncClient, url: str) -> dict:
 # -------------------------------------------------------------------------
 # Orchestrator & Scoring Matrix
 # -------------------------------------------------------------------------
-async def evaluate_url_safety(
-    target_url: str, 
-    heuristic_score: float = 0.0, 
-    is_redirected: bool = False
-) -> Dict[str, Any]:
-    
+async def evaluate_url_safety(target_url: str) -> Dict[str, Any]:
+    # 1. Query Google Safe Browsing API
     gsb_result = await check_google_safe_browsing(target_url)
-    
-    local_heuristic = analyze_domain_heuristics(target_url, is_redirected) if "analyze_domain_heuristics" in globals() else 0.0
-    final_heuristic = max(heuristic_score, local_heuristic)
+    is_gsb_flagged = gsb_result.get("is_flagged", False)
 
-    is_flagged = gsb_result.get("is_flagged", False)
-    threats = gsb_result.get("threats", [])
+    # 2. Run local ONNX ML prediction on server
+    ml_score = ml_service.predict(target_url)
 
-    if (is_flagged and threats) or final_heuristic >= 0.7:
+    # 3. Decision Rules Matrix
+    if is_gsb_flagged:
         verdict = "BAHAYA"
         risk_score = random.randint(66, 100)
-        
-    elif final_heuristic >= 0.3 or gsb_result.get("status", "").startswith("error"):
+    elif ml_score >= 0.5:
         verdict = "WASPADA"
         risk_score = random.randint(26, 65)
-        
     else:
         verdict = "AMAN"
         risk_score = random.randint(0, 25)
+
+    print(f"\n[SCAN REQUEST EVALUATED]")
+    print(f" ├─ Target URL   : {target_url}")
+    print(f" ├─ GSB Flagged  : {is_gsb_flagged}")
+    print(f" ├─ Server ML    : {ml_score:.4f}")
+    print(f" └─ Verdict      : {verdict} ({risk_score})\n")
 
     return {
         "scanned_url": target_url,
@@ -164,8 +164,6 @@ async def evaluate_url_safety(
         "verdict": verdict,
         "details": {
             "google_safe_browsing": gsb_result,
-            "heuristic_score": final_heuristic,
-            "virustotal": {"status": "disabled"},
-            "ipqs": {"status": "disabled"}
+            "ml_score": ml_score,
         }
     }

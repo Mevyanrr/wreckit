@@ -350,7 +350,6 @@ class _Viewfinder extends StatelessWidget {
     );
   }
 }
-
 class _CameraLayer extends StatelessWidget {
   final CameraController? controller;
   final bool isInitialized;
@@ -359,9 +358,26 @@ class _CameraLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isInitialized && controller != null) {
-      return CameraPreview(controller!);
+    if (isInitialized && controller != null && controller!.value.isInitialized) {
+      final cameraAspectRatio = controller!.value.aspectRatio;
+
+      return ClipRect(
+        child: SizedOverflowBox(
+          size: Size.infinite,
+          child: FittedBox(
+            fit: BoxFit.cover, 
+            child: SizedBox(
+              width: 1,
+              height: cameraAspectRatio < 1
+                  ? 1 / cameraAspectRatio
+                  : cameraAspectRatio,
+              child: CameraPreview(controller!),
+            ),
+          ),
+        ),
+      );
     }
+
     return Container(
       color: Appcolors.scannerBg,
       child: Center(
@@ -377,6 +393,33 @@ class _CameraLayer extends StatelessWidget {
     );
   }
 }
+
+// class _CameraLayer extends StatelessWidget {
+//   final CameraController? controller;
+//   final bool isInitialized;
+
+//   const _CameraLayer({required this.controller, required this.isInitialized});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (isInitialized && controller != null) {
+//       return CameraPreview(controller!);
+//     }
+//     return Container(
+//       color: Appcolors.scannerBg,
+//       child: Center(
+//         child: SizedBox(
+//           width: 24.w,
+//           height: 24.w,
+//           child: CircularProgressIndicator(
+//             strokeWidth: 2,
+//             color: Appcolors.accentTeal.withOpacity(0.5),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _TapToScanButton extends StatelessWidget {
   final bool isScanning;
