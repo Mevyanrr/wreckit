@@ -1,4 +1,4 @@
-# main.py
+# lib/backend/main.py
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List, Optional
@@ -26,7 +26,7 @@ app = FastAPI(title="QRisk Threat Intelligence API", lifespan=lifespan)
 
 
 class ScanPayload(BaseModel):
-    url: str  # Removed heuristic_score requirement
+    url: str  # Cleaned payload schema
 
 
 @app.post("/api/v1/scan")
@@ -35,7 +35,7 @@ async def scan_qr_code(payload: ScanPayload, session: Session = Depends(get_sess
     resolution = await resolve_url_redirects(payload.url)
     target_url = resolution["resolved_url"]
 
-    # 2. Run threat checks on the resolved target URL (evaluate_url_safety now handles ML internally)
+    # 2. Run threat checks (Fix: pass ONLY target_url)
     result = await evaluate_url_safety(target_url)
 
     # Enrich response with redirect metadata
