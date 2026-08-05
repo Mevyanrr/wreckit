@@ -50,6 +50,7 @@ dependencies:
   sqflite: ^2.4.3
   path: ^1.9.1
   flutter_onnxruntime: ^1.8.1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -63,7 +64,28 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/iconqrisk.png"
+  adaptive_icon_background: "#071C4D"
+  adaptive_icon_foreground: "assets/images/iconqrisk.png"
+  min_sdk_android: 21 
+  web:
+    generate: true
+    image_path: "assets/images/iconqrisk.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/images/iconqrisk.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/iconqrisk.png"
+    
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -79,6 +101,7 @@ flutter:
   assets:
     - assets/images/image_onboarding.png
     - assets/models/phishing_model_float32.tflite
+    - assets/images/iconqrisk.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
