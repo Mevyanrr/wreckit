@@ -52,7 +52,6 @@ class _ScanResultView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // konten bisa scroll
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 20.w),

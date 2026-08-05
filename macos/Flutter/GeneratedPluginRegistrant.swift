@@ -10,7 +10,7 @@ import file_picker
 import firebase_core
 import flutter_onnxruntime
 import share_plus
-import sqflite_darwin
+import sqflite
 import url_launcher_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {

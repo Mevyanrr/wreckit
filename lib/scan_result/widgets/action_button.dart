@@ -8,7 +8,6 @@ import 'package:wreckit/scan_result/viewmodels/scanresult_vm.dart';
 import 'package:wreckit/scan_result/views/detail_analisis.dart';
 import 'package:wreckit/scan_result/views/lapor_page.dart';
 
-
 class ActionButtons extends StatelessWidget {
   final ScanResultViewModel viewModel;
   const ActionButtons({super.key, required this.viewModel});
@@ -24,11 +23,9 @@ class ActionButtons extends StatelessWidget {
           textColor: Colors.white,
           onTap: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ReportScreen(),
-                ),
-              );
+              context,
+              MaterialPageRoute(builder: (context) => const ReportScreen()),
+            );
           },
         );
 
@@ -42,24 +39,25 @@ class ActionButtons extends StatelessWidget {
               icon: Icons.open_in_new_rounded,
               color: Appcolors.cyan,
               textColor: Appcolors.background,
-              onTap: () {},
+              onTap: () {
+                viewModel.openBrowser();
+              },
             ),
             SizedBox(height: 12.h),
             _SecondaryButton(
               label: 'Batalkan & Lihat Detail Analisis',
-               onTap: () {
-    viewModel.cancelAutoOpen();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider(
-          create: (_) => AnalysisDetailViewModel(viewModel.result),
-          child: const DetailAnalisisScreen(),
-        ),
-      ),
-    );
-  },
+              onTap: () {
+                viewModel.cancelAutoOpen();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (_) => AnalysisDetailViewModel(viewModel.result),
+                      child: const DetailAnalisisScreen(),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         );
@@ -116,16 +114,20 @@ class _PrimaryButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onTap,
         icon: Icon(icon, color: textColor, size: 18.sp),
-        label: Text(label,
-            style: TextStyle(
-                color: textColor,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w700)),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           elevation: 0,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.r)),
+            borderRadius: BorderRadius.circular(14.r),
+          ),
         ),
       ),
     );
@@ -147,13 +149,17 @@ class _SecondaryButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: Appcolors.cardBorder),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.r)),
+            borderRadius: BorderRadius.circular(14.r),
+          ),
         ),
-        child: Text(label,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
